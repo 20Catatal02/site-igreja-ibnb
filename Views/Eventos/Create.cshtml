@@ -1,0 +1,144 @@
+@model IBNB.Models.Evento
+
+@{
+    ViewData["Title"] = "Cadastrar Evento";
+}
+
+<div class="container my-4 col-md-6">
+    <div class="card shadow border-0 p-4">
+        <h2 class="mb-3 text-center text-primary">Novo Evento</h2>
+        
+        <form asp-action="Create">
+            <div class="mb-3">
+                <label asp-for="Titulo" class="form-label fw-bold">Título</label>
+                <input asp-for="Titulo" class="form-control" placeholder="Ex: Culto de Celebracao" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Descricao" class="form-label fw-bold">Descrição</label>
+                <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Detalhes sobre a programação..."></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DataHora" class="form-label fw-bold">Data e Hora</label>
+                <input asp-for="DataHora" class="form-control" type="datetime-local" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Local" class="form-label fw-bold">Local</label>
+                <input asp-for="Local" class="form-control" placeholder="Ex: Templo" />
+            </div>
+
+            <hr class="my-4" />
+
+<!-- Seleção de Repetição estilo Xiaomi/HyperOS -->
+            <div class="mb-3">
+                <label asp-for="TipoRecorrencia" class="form-label fw-bold">Repetir</label>
+                <select asp-for="TipoRecorrencia" id="selectTipoRecorrencia" class="form-select">
+                    <option value="Nunca">Nunca</option>
+                    <option value="Diario">Diariamente</option>
+                    <option value="SegundaSexta">Segunda a Sexta-feira</option>
+                    <option value="Semanal">Semanalmente</option>
+                    <option value="Mensal">Mensalmente</option>
+                    <option value="Anual">Anualmente</option>
+                    <option value="Personalizado">Personalizado...</option>
+                </select>
+            </div>
+
+            <!-- Painel de Personalização -->
+            <div id="painelPersonalizado" class="border p-3 rounded mb-3 bg-light" style="display: none;">
+                <h6 class="fw-bold mb-3">Recorrência Personalizada</h6>
+                
+                <div class="row g-3 align-items-center mb-3">
+                    <div class="col-auto">
+                        <label class="col-form-label">A cada</label>
+                    </div>
+                    <div class="col-auto" style="width: 100px;">
+                        <input asp-for="IntervaloRecorrencia" type="number" class="form-control" min="1" max="99" value="1" />
+                    </div>
+                    <div class="col-auto">
+                        <select asp-for="FrequenciaPersonalizada" id="selectFrequencia" class="form-select">
+                            <option value="dia">dia(s)</option>
+                            <option value="semana">semana(s)</option>
+                            <option value="mes">mês/meses</option>
+                            <option value="ano">ano(s)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="regrasAvancadasMes" class="border-top pt-3 mt-3" style="display: none;">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="checkIndiceSemana" />
+                        <label class="form-check-label" for="checkIndiceSemana">
+                            Repetir por dia da semana específico (ex: 2.º Domingo)
+                        </label>
+                    </div>
+                    
+                    <div id="camposIndiceSemana" class="row g-2 mt-1" style="display: none;">
+                        <div class="col-md-6">
+                            <select asp-for="IndiceSemana" class="form-select">
+                                <option value="">Índice...</option>
+                                <option value="1">1.ª semana</option>
+                                <option value="2">2.ª semana</option>
+                                <option value="3">3.ª semana</option>
+                                <option value="4">4.ª semana</option>
+                                <option value="5">Última semana</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select asp-for="DiaDaSemana" class="form-select">
+                                <option value="">Dia...</option>
+                                <option value="Sunday">Domingo</option>
+                                <option value="Monday">Segunda-feira</option>
+                                <option value="Tuesday">Terça-feira</option>
+                                <option value="Wednesday">Quarta-feira</option>
+                                <option value="Thursday">Quinta-feira</option>
+                                <option value="Friday">Sexta-feira</option>
+                                <option value="Saturday">Sábado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+                <button type="submit" class="btn btn-success">Salvar Evento</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const selectTipo = document.getElementById('selectTipoRecorrencia');
+        const painelPersonalizado = document.getElementById('painelPersonalizado');
+        const selectFrequencia = document.getElementById('selectFrequencia');
+        const regrasAvancadasMes = document.getElementById('regrasAvancadasMes');
+        const checkIndiceSemana = document.getElementById('checkIndiceSemana');
+        const camposIndiceSemana = document.getElementById('camposIndiceSemana');
+
+        function atualizarExibicao() {
+            if (selectTipo.value === 'Personalizado') {
+                painelPersonalizado.style.display = 'block';
+            } else {
+                painelPersonalizado.style.display = 'none';
+            }
+
+            if (selectFrequencia.value === 'mes' || selectFrequencia.value === 'ano') {
+                regrasAvancadasMes.style.display = 'block';
+            } else {
+                regrasAvancadasMes.style.display = 'none';
+            }
+        }
+
+        selectTipo.addEventListener('change', atualizarExibicao);
+        selectFrequencia.addEventListener('change', atualizarExibicao);
+
+        checkIndiceSemana.addEventListener('change', function() {
+            camposIndiceSemana.style.display = this.checked ? 'flex' : 'none';
+        });
+
+        atualizarExibicao();
+    </script>
+}
