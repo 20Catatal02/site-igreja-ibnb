@@ -1,0 +1,32 @@
+@model IEnumerable<IBNB.Models.Evento>
+
+@{
+    ViewData["Title"] = "Agenda da IBNB";
+}
+
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Agenda de Eventos e Cultos</h2>
+        <a asp-action="Create" class="btn btn-primary">Novo Evento</a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary fw-bold">@item.Titulo</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            Local: @item.Local
+                        </h6>
+                        <p class="card-text text-secondary">@item.Descricao</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0 text-muted small">
+                        Data: @item.DataHora.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
