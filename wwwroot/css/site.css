@@ -1,31 +1,36 @@
+/* Força o fundo escuro global */
+body {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+/* Ajusta a navbar para não ficar branca */
+.navbar {
+    background-color: #212529 !important;
+}
+
+/* Ajusta a cor dos links da navbar no modo escuro */
+.navbar .nav-link, .navbar-brand {
+    color: #e0e0e0 !important;
+}
+
 html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 0 !important; /* Remove a margem padrão que causava o buraco no final */
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.footer {
+    position: static !important; /* Remove a fixação absoluta */
+    white-space: normal !important; 
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.footer {
+    color: #888 !important; /* Cor cinza clara para garantir leitura no fundo escuro */
+}
+.footer a {
+    color: #4da3ff !important; /* Azul claro para o link */
 }
