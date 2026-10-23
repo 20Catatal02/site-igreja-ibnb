@@ -9,6 +9,8 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddHttpClient<IBNB.Services.FeriadoService>();
+
 var app = builder.Build();
     
 // Configure the HTTP request pipeline.

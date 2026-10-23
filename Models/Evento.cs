@@ -1,6 +1,8 @@
+using System; // Necessário para DateTime e DayOfWeek
+
 namespace IBNB.Models
 {
-    public class Evento
+    public class Evento : ISoftDeletable
     {
         public int Id { get; set; }
         public string Titulo { get; set; } = string.Empty;
@@ -21,5 +23,10 @@ namespace IBNB.Models
         // Para casos específicos (ex: "2.º domingo")
         public int? IndiceSemana { get; set; } 
         public DayOfWeek? DiaDaSemana { get; set; } 
+
+        // --- Propriedades do Soft Delete ---
+        public bool IsAtivo { get; set; } = true;
+        public DateTime? DeletedAt { get; set; }
+        public string? DeletedPor { get; set; }
     }
 }
