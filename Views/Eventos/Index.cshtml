@@ -1,32 +1,110 @@
 @model IEnumerable<IBNB.Models.Evento>
 
 @{
-    ViewData["Title"] = "Agenda da IBNB";
+    ViewData["Title"] = "Eventos e Agenda";
+    var hoje = DateTime.Now;
+    var primeiroDiaDoMes = new DateTime(hoje.Year, hoje.Month, 1);
+    int diasNoMes = DateTime.DaysInMonth(hoje.Year, hoje.Month);
+    int diaSemanaInicio = (int)primeiroDiaDoMes.DayOfWeek;
+    var culture = new System.Globalization.CultureInfo("pt-BR");
+    string nomeMes = hoje.ToString("MMMM yyyy", culture);
 }
 
 <div class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Agenda de Eventos e Cultos</h2>
-        <a asp-action="Create" class="btn btn-primary">Novo Evento</a>
+        <div>
+            <h2 class="text-primary mb-1">Agenda de Eventos</h2>
+            <p class="text-muted mb-0">Gestão de cultos, programações e calendário geral.</p>
+        </div>
+        <div>
+            <a asp-action="Calendario" class="btn btn-primary me-2">Ver Calendário Unificado</a>
+            <a asp-action="Create" class="btn btn-success">Novo Evento</a>
+        </div>
     </div>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        @foreach (var item in Model)
-        {
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary fw-bold">@item.Titulo</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">
-                            Local: @item.Local
-                        </h6>
-                        <p class="card-text text-secondary">@item.Descricao</p>
-                    </div>
-                    <div class="card-footer bg-transparent border-top-0 text-muted small">
-                        Data: @item.DataHora.ToString("dd/MM/yyyy HH:mm")
-                    </div>
-                </div>
-            </div>
-        }
+    <!-- Pré-visualização do Calendário do Mês -->
+    <div class="card shadow border-0 p-4 bg-dark text-light mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-capitalize text-light mb-0">Calendário de @nomeMes</h4>
+            <span class="badge bg-secondary">Pré-visualização Mensal</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered text-center text-light align-middle border-secondary">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="text-danger">Dom</th>
+                        <th>Seg</th>
+                        <th>Ter</th>
+                        <th>Qua</th>
+                        <th>Qui</th>
+                        <th>Sex</th>
+                        <th>Sáb</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int diaAtual = 1;
+                        int linhas = (int)Math.Ceiling((diasNoMes + diaSemanaInicio) / 7.0);
+                        for (int i = 0; i < linhas; i++)
+                        {
+                            <tr>
+                                @for (int j = 0; j < 7; j++)
+                                {
+                                    if ((i == 0 && j < diaSemanaInicio) || diaAtual > diasNoMes)
+                                    {
+                                        <td class="text-muted bg-opacity-25">-</td>
+                                    }
+                                    else
+                                    {
+                                        bool ehHoje = (diaAtual == hoje.Day);
+                                        string classeCss = ehHoje ? "bg-primary text-white fw-bold rounded py-3" : "py-3";
+                                        <td class="@classeCss">
+                                            <span>@diaAtual</span>
+                                        </td>
+                                        diaAtual++;
+                                    }
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Lista de Eventos Cadastrados -->
+    <div class="card shadow border-0 p-4">
+        <h4 class="mb-3 text-light">Lista de Eventos Cadastrados</h4>
+        <table class="table table-hover align-middle table-dark">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Data e Hora</th>
+                    <th>Local</th>
+                    <th>Recorrência</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">Nenhum evento cadastrado.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">@item.Titulo</td>
+                            <td>@item.DataHora.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@item.Local</td>
+                            <td><span class="badge bg-info text-dark">@item.TipoRecorrencia</span></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
     </div>
 </div>

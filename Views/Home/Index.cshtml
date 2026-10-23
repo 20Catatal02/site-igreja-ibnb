@@ -1,12 +1,25 @@
 ﻿@{
-    ViewData["Title"] = "Página Inicial";
+    ViewData["Title"] = "Início";
+    var hoje = DateTime.Now;
+    var culture = new System.Globalization.CultureInfo("pt-BR");
+    string dataFormatada = hoje.ToString("dddd, dd 'de' MMMM 'de' yyyy", culture);
 }
 
-<div class="text-center my-5">
-    <h1 class="display-4 fw-bold">Bem-vindo à IBNB</h1>
-    <p class="lead text-muted mt-3">Acompanhe a nossa programação, cultos e eventos especiais.</p>
-    
-    <div class="mt-4">
-        <a class="btn btn-primary btn-lg px-4" asp-controller="Eventos" asp-action="Index">Ver Agenda de Eventos</a>
+<div class="container my-5">
+    <div class="p-5 mb-4 bg-dark rounded-3 shadow border border-secondary text-light">
+        <div class="container-fluid py-3">
+            <h1 class="display-5 fw-bold text-primary">Bem-vindo à IBNB</h1>
+            <p class="fs-4 text-muted">Sistema de Gestão e Agenda Unificada</p>
+            
+            <div class="my-4 p-3 bg-secondary bg-opacity-10 rounded border border-secondary">
+                <span class="text-uppercase tracking-wider text-muted small d-block">Data de Hoje</span>
+                <h3 class="mb-0 text-light text-capitalize">@dataFormatada</h3>
+            </div>
+
+            <div class="mt-4">
+                <a class="btn btn-primary btn-lg me-2" asp-controller="Eventos" asp-action="Calendario">Ver Calendário Unificado</a>
+                <a class="btn btn-outline-light btn-lg" asp-controller="Eventos" asp-action="Index">Gerir Eventos</a>
+            </div>
+        </div>
     </div>
 </div>
