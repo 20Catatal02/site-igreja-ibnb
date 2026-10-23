@@ -28,7 +28,6 @@ C:\Projeto\IBNB\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
 C:\Projeto\IBNB\obj\Debug\net10.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Projeto\IBNB\obj\Debug\net10.0\scopedcss\bundle\IBNB.styles.css
 C:\Projeto\IBNB\obj\Debug\net10.0\scopedcss\projectbundle\IBNB.bundle.scp.css
-C:\Projeto\IBNB\obj\Debug\net10.0\compressed\b9utk6olfi-{0}-b9sayid5wm-b9sayid5wm.gz
 C:\Projeto\IBNB\obj\Debug\net10.0\compressed\ckgl6giy5a-{0}-61n19gt1b8-61n19gt1b8.gz
 C:\Projeto\IBNB\obj\Debug\net10.0\compressed\761fty52r4-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 C:\Projeto\IBNB\obj\Debug\net10.0\compressed\csqv1a7s4d-{0}-bqjiyaj88i-bqjiyaj88i.gz
@@ -253,3 +252,4 @@ C:\Projeto\IBNB\obj\Debug\net10.0\compressed\a3ygkwa5zy-{0}-2z0ns9nrw6-2z0ns9nrw
 C:\Projeto\IBNB\obj\Debug\net10.0\compressed\nezrqnk58p-{0}-muycvpuwrr-muycvpuwrr.gz
 C:\Projeto\IBNB\obj\Debug\net10.0\compressed\v0zgfp0y55-{0}-87fc7y1x7t-87fc7y1x7t.gz
 C:\Projeto\IBNB\obj\Debug\net10.0\compressed\yfc7ypekbg-{0}-mlv21k5csn-mlv21k5csn.gz
+C:\Projeto\IBNB\obj\Debug\net10.0\compressed\b9utk6olfi-{0}-f2feo3sz2v-f2feo3sz2v.gz
