@@ -35,3 +35,21 @@ body {
     color: #4da3ff !important; /* Azul claro para o link */
 }
 
+/* Remove as bolinhas de qualquer lista de navegação */
+.navbar-nav {
+    list-style-type: none !important;
+    padding-left: 0 !important;
+}
+
+/* Força o fundo escuro na tela de login e páginas do Identity */
+body {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+/* Ajusta os inputs da tela de login para não ficarem com fundo branco estourado */
+.form-control {
+    background-color: #2b2b2b !important;
+    color: #fff !important;
+    border: 1px solid #444 !important;
+}

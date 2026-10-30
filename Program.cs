@@ -2,8 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using IBNB.Data; 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Traduzir interface para pt-BR
+var cultureInfo = new CultureInfo("pt-BR");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 // Configuração do Banco de Dados
 builder.Services.AddDbContext<AppDbContext>(options => 

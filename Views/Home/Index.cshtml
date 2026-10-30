@@ -1,24 +1,57 @@
 ﻿@{
-    ViewData["Title"] = "Início";
-    var hoje = DateTime.Now;
-    var culture = new System.Globalization.CultureInfo("pt-BR");
-    string dataFormatada = hoje.ToString("dddd, dd 'de' MMMM 'de' yyyy", culture);
+    ViewData["Title"] = "Bem-vindo";
 }
 
-<div class="container my-5">
-    <div class="p-5 mb-4 bg-dark rounded-3 shadow border border-secondary text-light">
-        <div class="container-fluid py-3">
-            <h1 class="display-5 fw-bold text-primary">Bem-vindo à IBNB</h1>
-            <p class="fs-4 text-muted">Sistema de Gestão e Agenda Unificada</p>
-            
-            <div class="my-4 p-3 bg-secondary bg-opacity-10 rounded border border-secondary">
-                <span class="text-white-50">DATA DE HOJE</span>
-                <h3 class="mb-0 text-light text-capitalize">@dataFormatada</h3>
-            </div>
+<!-- HERO SECTION -->
+<div class="row justify-content-center mb-5 mt-4">
+    <div class="col-lg-10">
+        <div class="card bg-dark border-secondary shadow-lg">
+            <div class="card-body p-5 text-center">
+                <h1 class="display-4 fw-bold text-primary mb-3">Bem-vindo à IBNB</h1>
+                <p class="lead text-light mb-4">Sistema de Gestão e Agenda Unificada para a nossa comunidade.</p>
+                
+                <div class="d-inline-block bg-secondary bg-opacity-25 rounded px-4 py-3 mb-4 border border-secondary">
+                    <span class="text-light-50 d-block text-uppercase small">Data de Hoje</span>
+                    <span class="fs-4 fw-bold text-white">@DateTime.Now.ToString("dddd, dd 'De' MMMM 'De' yyyy")</span>
+                </div>
 
-            <div class="mt-4">
-                <a class="btn btn-primary btn-lg me-2" asp-controller="Eventos" asp-action="Calendario">Ver Calendário Unificado</a>
-                <button class="btn btn-outline-light">Gerir Eventos</button>
+                <div class="d-flex justify-content-center gap-3">
+                    <a asp-controller="Eventos" asp-action="Calendario" class="btn btn-primary btn-lg px-4">
+                        Ver Calendário
+                    </a>
+                    <a asp-controller="Aniversariantes" asp-action="Index" class="btn btn-outline-light btn-lg px-4">
+                        Aniversariantes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FUNCIONALIDADES -->
+<h3 class="text-center mb-4 text-light">O que você encontra aqui</h3>
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100 bg-dark border-secondary text-center p-3">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Agenda Unificada</h4>
+                <p class="card-text text-light-50">Acompanhe os cultos, eventos da igreja e feriados nacionais num só lugar.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 bg-dark border-secondary text-center p-3">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Aniversariantes</h4>
+                <p class="card-text text-light-50">Veja a lista de irmãos que fazem aniversário e não perca nenhuma data especial.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 bg-dark border-secondary text-center p-3">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Área Restrita</h4>
+                <p class="card-text text-light-50">Líderes e administradores têm acesso a ferramentas de gestão exclusivas.</p>
             </div>
         </div>
     </div>
