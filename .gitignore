@@ -1,0 +1,13 @@
+## Ignorar arquivos de compilação
+[Bb]in/
+[Oo]bj/
+
+## Ignorar arquivos do Visual Studio / VS Code
+.vs/
+.vscode/
+*.user
+*.suo
+
+## Ignorar arquivos de log e ambiente
+*.log
+.env

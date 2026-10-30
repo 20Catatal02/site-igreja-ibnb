@@ -1,0 +1,60 @@
+@model IEnumerable<IBNB.Models.Aniversariante>
+@{
+    ViewData["Title"] = "Aniversariantes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>@ViewData["Title"]</h2>
+    <button class="btn btn-primary" onclick="abrirModal()">
+        Novo Aniversariante
+    </button>
+</div>
+
+<div class="card bg-dark border-secondary">
+    <div class="card-body p-0">
+        <table class="table table-dark table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Data de Nascimento</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="3" class="text-center py-4">Nenhum aniversariante cadastrado.</td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="align-middle">@item.Nome</td>
+                        <td class="align-middle">@item.DataNascimento.ToString("dd/MM/yyyy")</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-light" onclick="abrirModal(@item.Id)">Editar</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="excluir(@item.Id, '@item.Nome')">Excluir</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Genérico para Injetar a Partial View -->
+<div class="modal fade" id="modalAniversariante" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light border-secondary" id="modalContent">
+            <!-- O conteúdo do _FormModal será injetado aqui -->
+        </div>
+    </div>
+</div>
+
+<!-- Token anti-forgery para requisições AJAX de exclusão -->
+@Html.AntiForgeryToken()
+
+@section Scripts {
+    <script src="~/js/aniversariantes.js" asp-append-version="true"></script>
+}
