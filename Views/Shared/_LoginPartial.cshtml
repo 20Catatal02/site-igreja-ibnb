@@ -4,10 +4,10 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
+    <li class="nav-item ms-auto">
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Olá, @User.Identity?.Name!</a>
     </li>
-    <li class="nav-item">
+    <li class="nav-item ms-3">
         <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
             <button type="submit" class="nav-link btn btn-link text-dark">Sair</button>
         </form>
@@ -15,10 +15,10 @@
 }
 else
 {
-    <li class="nav-item">
+    <li class="nav-item ms-auto">
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Registrar</a>
     </li>
-    <li class="nav-item">
+    <li class="nav-item ms-3">
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Entrar</a>
     </li>
 }
