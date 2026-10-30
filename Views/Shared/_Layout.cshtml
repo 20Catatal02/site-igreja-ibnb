@@ -29,29 +29,34 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Eventos" asp-action="Index">Eventos</a>
                         </li>
                         <li class="nav-item">
-                            <a  class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Aniversariantes" asp-action="Index">Aniversariantes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
 
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item ms-auto">
-                                <span class="nav-link text-dark fw-bold">Olá, @User.Identity.Name!</span>
+                        <!-- Bloco de Autenticação -->
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
                             <li class="nav-item">
-                                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                                    <button type="submit" class="nav-link btn btn-link text-danger">Sair</button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item ms-auto">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Registrar</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Eventos" asp-action="Index">Eventos</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Entrar</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Aniversariantes" asp-action="Index">Aniversariantes</a>
                             </li>
-                        }
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+
+                            <!-- Mantém o alinhamento à direita usando o ms-auto no container -->
+                            <div class="ms-auto d-flex">
+                                <ul class="navbar-nav">
+                                    <partial name="_LoginPartial" />
+                                </ul>
+                            </div>
+                        </ul>
                     </ul>
                     <!-- FIM DO MENU -->
                     

@@ -4,9 +4,11 @@ using IBNB.Data;
 using IBNB.Models;
 using IBNB.Services;
 using IBNB.ViewModels;
+using Microsoft.AspNetCore.Authorization; 
 
 namespace IBNB.Controllers
 {
+    [Authorize]
     public class EventosController : Controller
     {
         private readonly AppDbContext _context;
