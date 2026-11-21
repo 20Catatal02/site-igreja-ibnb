@@ -217,18 +217,18 @@
 
     /* ===== Microinterações ===== */
 
-    /* O bloco inteiro reage ao hover do card: a linha central ganha destaque
-       e o ponto acende. */
+    /* Cor de destaque de cada bloco (verde normal, amarelo para Ceia/Virada) */
     .ev-bloco {
         --ev-cor: #198754;
+        --ev-tempo: 1.15s;
+        --ev-curva: cubic-bezier(.25, .1, .25, 1);
     }
     .ev-bloco.destaque {
         --ev-cor: #facc15;
     }
 
-    /* Linha central com destaque suave ao passar o mouse no bloco.
-       Somente no desktop: no mobile nao existe linha central, portanto
-       o realce nao deve ser desenhado sobre o card. */
+    /* Linha central: somente no desktop. No mobile nao existe linha central,
+       portanto o realce nunca deve ser desenhado sobre o card. */
     .ev-bloco::after {
         content: none;
     }
@@ -237,8 +237,8 @@
     }
 
     @@media (min-width: 768px) {
-        /* Realce da linha central: o trecho aceso acompanha o bloco sob o
-           mouse, com transicao de meio segundo. */
+        /* O trecho aceso da linha central cresce devagar, acompanhando o bloco
+           sob o mouse. */
         .ev-bloco::after {
             content: "";
             position: absolute;
@@ -251,8 +251,8 @@
             background-color: var(--ev-cor);
             opacity: 0;
             transition:
-                opacity .5s cubic-bezier(.4, 0, .2, 1),
-                transform .5s cubic-bezier(.4, 0, .2, 1);
+                opacity var(--ev-tempo) var(--ev-curva),
+                transform var(--ev-tempo) var(--ev-curva);
             pointer-events: none;
         }
         .ev-bloco:hover::after {
@@ -262,8 +262,15 @@
         }
     }
 
-    /* Ponto central acendendo: o halo cresce em dois estagios, para o dia
-       anterior perder o brilho enquanto o novo acende. */
+    /* Transicao da luz do ponto central: longa e continua, para o dia anterior
+       apagar aos poucos enquanto o novo acende. */
+    .ev-ponto span {
+        transition:
+            background-color var(--ev-tempo) var(--ev-curva),
+            box-shadow var(--ev-tempo) var(--ev-curva),
+            transform var(--ev-tempo) var(--ev-curva);
+    }
+
     .ev-bloco:hover .ev-ponto span {
         background-color: #4ade80;
         box-shadow:
@@ -280,14 +287,14 @@
             0 0 14px 3px rgba(250, 204, 21, .30);
     }
 
-    /* Card: entrada e saida da luz no mesmo ritmo (.45s) - suave, sem ser lerdo */
+    /* Card: mesma cadencia lenta, no mesmo ritmo para entrar e sair. */
     .ev-card {
         transition:
-            border-color .45s cubic-bezier(.4, 0, .2, 1),
-            transform .45s cubic-bezier(.4, 0, .2, 1),
-            box-shadow .45s cubic-bezier(.4, 0, .2, 1),
-            opacity .45s cubic-bezier(.4, 0, .2, 1),
-            filter .45s cubic-bezier(.4, 0, .2, 1);
+            border-color var(--ev-tempo) var(--ev-curva),
+            transform var(--ev-tempo) var(--ev-curva),
+            box-shadow var(--ev-tempo) var(--ev-curva),
+            opacity var(--ev-tempo) var(--ev-curva),
+            filter var(--ev-tempo) var(--ev-curva);
     }
     .ev-bloco:hover .ev-card {
         border-color: var(--ev-cor);
@@ -295,7 +302,16 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, .38);
     }
 
-    /* Marco lateral também responde */
+    /* Marco lateral tambem responde no mesmo tempo */
+    .ev-marco-dia {
+        transition: color var(--ev-tempo) var(--ev-curva);
+    }
+    .ev-marco-linha {
+        transition:
+            width var(--ev-tempo) var(--ev-curva),
+            background-color var(--ev-tempo) var(--ev-curva),
+            opacity var(--ev-tempo) var(--ev-curva);
+    }
     .ev-bloco:hover .ev-marco-dia {
         color: #fff;
     }
@@ -319,7 +335,6 @@
         line-height: 1;
         color: #495057;
         letter-spacing: -.03em;
-        transition: color .45s ease;
     }
     .ev-marco-mes {
         font-size: .72rem;
@@ -336,7 +351,6 @@
         border-radius: 2px;
         background-color: #343a40;
         opacity: .7;
-        transition: width .5s cubic-bezier(.22, .61, .36, 1), background-color .45s ease, opacity .45s ease;
     }
 
     /* Rótulos de metadados */
@@ -356,32 +370,41 @@
         color: #4ade80;
     }
 
-    /* ===== Mobile: zoom discreto ao tocar, com foco no card acionado ===== */
+    /* ===== Mobile: zoom e foco por toque (persistente) ===== */
     @@media (max-width: 767.98px) {
         .ev-card {
             transition:
-                transform .3s cubic-bezier(.22, .61, .36, 1),
-                border-color .3s ease,
-                box-shadow .3s ease,
-                opacity .3s ease,
-                filter .3s ease;
-        }
-        .ev-card:active {
-            transform: scale(1.035);
-            border-color: var(--ev-cor);
-            box-shadow: 0 8px 22px rgba(0, 0, 0, .4);
+                transform .35s cubic-bezier(.22, .61, .36, 1),
+                border-color .35s ease,
+                box-shadow .35s ease,
+                opacity .35s ease,
+                filter .35s ease;
         }
 
-        /* Enquanto um card esta acionado, os demais perdem foco:
-           ficam levemente transparentes e desfocados. */
-        .ev-trilha:has(.ev-card:active) .ev-bloco {
-            opacity: .55;
-            filter: blur(1.2px);
-            transition: opacity .3s ease, filter .3s ease;
+        /* Card selecionado por toque: zoom discreto e nitido */
+        .ev-bloco.ev-selecionado .ev-card {
+            transform: scale(1.06);
+            border-color: var(--ev-cor);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, .45);
         }
-        .ev-trilha:has(.ev-card:active) .ev-bloco:has(.ev-card:active) {
+
+        /* Enquanto houver um card selecionado, os demais ficam opacos e
+           desfocados. O estado permanece ate o usuario tocar fora do card. */
+        .ev-trilha.ev-tem-selecao .ev-bloco {
+            opacity: .45;
+            filter: blur(1.5px);
+            transition: opacity .35s ease, filter .35s ease;
+        }
+        .ev-trilha.ev-tem-selecao .ev-bloco.ev-selecionado {
             opacity: 1;
             filter: none;
+        }
+
+        /* Nao selecionar texto ao tocar no card */
+        .ev-card {
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
     }
 
@@ -540,3 +563,57 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        // Mobile: um toque seleciona o card (zoom + foco).
+        // Toque fora de qualquer card limpa a selecao e todos voltam a ficar legiveis.
+        (function () {
+            var trilha = document.querySelector('.ev-trilha');
+            if (!trilha) { return; }
+
+            var blocoSelecionado = null;
+
+            function limpar() {
+                if (blocoSelecionado) {
+                    blocoSelecionado.classList.remove('ev-selecionado');
+                    blocoSelecionado = null;
+                }
+                trilha.classList.remove('ev-tem-selecao');
+            }
+
+            trilha.addEventListener('click', function (e) {
+                var bloco = e.target.closest('.ev-bloco');
+
+                // Toque fora de qualquer card: volta ao normal
+                if (!bloco) {
+                    limpar();
+                    return;
+                }
+
+                e.preventDefault();
+
+                // Toque no mesmo card ja selecionado: desmarca
+                if (bloco === blocoSelecionado) {
+                    limpar();
+                    return;
+                }
+
+                if (blocoSelecionado) {
+                    blocoSelecionado.classList.remove('ev-selecionado');
+                }
+
+                blocoSelecionado = bloco;
+                bloco.classList.add('ev-selecionado');
+                trilha.classList.add('ev-tem-selecao');
+            });
+
+            // Toque fora da trilha tambem limpa a selecao
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.ev-trilha')) {
+                    limpar();
+                }
+            });
+        })();
+    </script>
+}
