@@ -237,6 +237,8 @@
     }
 
     @@media (min-width: 768px) {
+        /* Realce da linha central: o trecho aceso acompanha o bloco sob o
+           mouse, com transicao de meio segundo. */
         .ev-bloco::after {
             content: "";
             position: absolute;
@@ -244,37 +246,48 @@
             bottom: 0;
             left: 50%;
             width: 2px;
-            transform: translateX(-50%) scaleY(.35);
+            transform: translateX(-50%) scaleY(.45);
             transform-origin: center;
             background-color: var(--ev-cor);
             opacity: 0;
-            transition: opacity .6s ease, transform .6s cubic-bezier(.22, .61, .36, 1);
+            transition:
+                opacity .5s cubic-bezier(.4, 0, .2, 1),
+                transform .5s cubic-bezier(.4, 0, .2, 1);
             pointer-events: none;
         }
         .ev-bloco:hover::after {
             content: "";
-            opacity: .38;
+            opacity: .42;
             transform: translateX(-50%) scaleY(1);
         }
     }
 
-    /* Ponto central acendendo: brilho curto e suave */
+    /* Ponto central acendendo: o halo cresce em dois estagios, para o dia
+       anterior perder o brilho enquanto o novo acende. */
     .ev-bloco:hover .ev-ponto span {
         background-color: #4ade80;
-        box-shadow: 0 0 0 5px #1b1f23, 0 0 0 6px var(--ev-cor), 0 0 10px 1px rgba(74, 222, 128, .35);
-        transform: scale(1.1);
+        box-shadow:
+            0 0 0 5px #1b1f23,
+            0 0 0 6px var(--ev-cor),
+            0 0 14px 3px rgba(74, 222, 128, .30);
+        transform: scale(1.12);
     }
     .ev-bloco.destaque:hover .ev-ponto span {
         background-color: #fde047;
-        box-shadow: 0 0 0 5px #1b1f23, 0 0 0 6px #a16207, 0 0 10px 1px rgba(250, 204, 21, .35);
+        box-shadow:
+            0 0 0 5px #1b1f23,
+            0 0 0 6px #a16207,
+            0 0 14px 3px rgba(250, 204, 21, .30);
     }
 
-    /* Card: elevação e borda suave (transição longa = luz mais calma) */
+    /* Card: entrada e saida da luz no mesmo ritmo (.45s) - suave, sem ser lerdo */
     .ev-card {
         transition:
-            border-color .55s cubic-bezier(.22, .61, .36, 1),
-            transform .55s cubic-bezier(.22, .61, .36, 1),
-            box-shadow .55s cubic-bezier(.22, .61, .36, 1);
+            border-color .45s cubic-bezier(.4, 0, .2, 1),
+            transform .45s cubic-bezier(.4, 0, .2, 1),
+            box-shadow .45s cubic-bezier(.4, 0, .2, 1),
+            opacity .45s cubic-bezier(.4, 0, .2, 1),
+            filter .45s cubic-bezier(.4, 0, .2, 1);
     }
     .ev-bloco:hover .ev-card {
         border-color: var(--ev-cor);
@@ -343,18 +356,32 @@
         color: #4ade80;
     }
 
-    /* ===== Mobile: zoom sutil ao tocar no card ===== */
+    /* ===== Mobile: zoom discreto ao tocar, com foco no card acionado ===== */
     @@media (max-width: 767.98px) {
         .ev-card {
             transition:
-                transform .28s cubic-bezier(.22, .61, .36, 1),
-                border-color .28s ease,
-                box-shadow .28s ease;
+                transform .3s cubic-bezier(.22, .61, .36, 1),
+                border-color .3s ease,
+                box-shadow .3s ease,
+                opacity .3s ease,
+                filter .3s ease;
         }
         .ev-card:active {
-            transform: scale(1.015);
+            transform: scale(1.035);
             border-color: var(--ev-cor);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, .4);
+        }
+
+        /* Enquanto um card esta acionado, os demais perdem foco:
+           ficam levemente transparentes e desfocados. */
+        .ev-trilha:has(.ev-card:active) .ev-bloco {
+            opacity: .55;
+            filter: blur(1.2px);
+            transition: opacity .3s ease, filter .3s ease;
+        }
+        .ev-trilha:has(.ev-card:active) .ev-bloco:has(.ev-card:active) {
+            opacity: 1;
+            filter: none;
         }
     }
 
