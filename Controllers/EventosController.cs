@@ -73,12 +73,35 @@ namespace IBNB.Controllers
                 });
             }
 
+            // Ha feriado dentro da janela exibida? (mesma logica de cores do calendario)
+            var temFeriado = false;
+            try
+            {
+                var feriados = await _feriadoService.ObterFeriadosAsync(hoje.Year);
+                foreach (var f in feriados)
+                {
+                    if (DateTime.TryParse(f.Date, out var dataFeriado)
+                        && dataFeriado.Date >= hoje.Date
+                        && dataFeriado.Date <= fimJanela.Date)
+                    {
+                        temFeriado = true;
+                        break;
+                    }
+                }
+            }
+            catch
+            {
+                // Falha ao consultar feriados nao deve impedir a vitrine de carregar
+                temFeriado = false;
+            }
+
             var vm = new ViewModels.EventosIndexViewModel
             {
                 Tipos = selecionados,
                 Hoje = DateTime.Now,
                 NomeMes = hoje.ToString("MMMM 'de' yyyy", culture),
-                PodeCriarEvento = User?.Identity?.IsAuthenticated ?? false
+                PodeCriarEvento = User?.Identity?.IsAuthenticated ?? false,
+                TemFeriado = temFeriado
             };
 
             return View(vm);

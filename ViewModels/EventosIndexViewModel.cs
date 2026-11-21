@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace IBNB.ViewModels
 {
@@ -58,5 +58,8 @@ namespace IBNB.ViewModels
 
         // Usuário autenticado pode criar eventos
         public bool PodeCriarEvento { get; set; }
+
+        // Existe feriado dentro da janela exibida (define o vermelho na linha central)
+        public bool TemFeriado { get; set; }
     }
 }
