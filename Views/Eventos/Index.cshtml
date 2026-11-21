@@ -1,4 +1,4 @@
-@model IBNB.ViewModels.EventosIndexViewModel
+﻿@model IBNB.ViewModels.EventosIndexViewModel
 
 @{
     ViewData["Title"] = "Eventos";
@@ -167,6 +167,48 @@
         color: #2c3136;
         letter-spacing: -.04em;
     }
+    /* Caixa de detalhe que preenche o lado vazio do layout alternado */
+    .ev-lateral-caixa {
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+    }
+    .ev-lateral-dia {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #e9ecef;
+        text-transform: capitalize;
+        line-height: 1.2;
+    }
+    .ev-lateral-data {
+        font-size: .88rem;
+        color: #9aa4ae;
+        text-transform: capitalize;
+    }
+    .ev-lateral-hora {
+        font-size: .95rem;
+        font-weight: 600;
+        color: #198754;
+        margin-top: .4rem;
+    }
+    .ev-card.destaque ~ .ev-lateral .ev-lateral-hora {
+        color: #facc15;
+    }
+    .ev-lateral-link {
+        margin-top: .75rem;
+        font-size: .78rem;
+        color: #6ea8fe;
+        text-decoration: none;
+        width: fit-content;
+    }
+    .ev-lateral-link:hover {
+        text-decoration: underline;
+        color: #9ec5fe;
+    }
+    /* Mobile/tablet: a data aparece dentro do card */
+    .ev-data {
+        text-transform: capitalize;
+    }
 
     /* ===== Desktop: alterna esquerda / direita ===== */
     @@media (min-width: 768px) {
@@ -231,7 +273,7 @@
         <h1>Eventos da Igreja</h1>
         <p>
             Conheça as programações que acontecem em nossa igreja.
-            Cada uma é exibida uma única vez, com o resumo da sua frequência.
+            As próximas programações dos próximos 15 dias, cada uma exibida uma única vez.
         </p>
         <div class="ev-acoes">
             <a asp-action="Calendario" class="btn btn-primary px-4">Calendário</a>
@@ -289,6 +331,20 @@
 
                         <div class="ev-meta">
                             <div class="ev-meta-linha">
+                                <span class="ev-meta-icone">&#128197;</span>
+                                <span class="ev-data">
+                                    @tipo.DataHora.ToString("dddd, dd 'de' MMMM", culture)
+                                    @if (tipo.DataHora.Date == Model.Hoje.Date)
+                                    {
+                                        <strong class="text-success">· hoje</strong>
+                                    }
+                                    else if (tipo.DataHora.Date == Model.Hoje.Date.AddDays(1))
+                                    {
+                                        <strong class="text-success">· amanhã</strong>
+                                    }
+                                </span>
+                            </div>
+                            <div class="ev-meta-linha">
                                 <span class="ev-meta-icone">&#9210;</span>
                                 <span>@tipo.ResumoRecorrencia</span>
                             </div>
@@ -324,8 +380,27 @@
                     <!-- Marcador central (desktop) -->
                     <div class="ev-ponto"><span></span></div>
 
-                    <!-- Detalhe lateral (desktop) -->
+                    <!-- Detalhe lateral (desktop): preenche o espaço vago -->
                     <div class="ev-lateral">
+                        <div class="ev-lateral-caixa">
+                            <div class="ev-lateral-dia">
+                                @(tipo.ProximaData.HasValue
+                                    ? tipo.ProximaData.Value.ToString("dddd", culture)
+                                    : tipo.DataHora.ToString("dddd", culture))
+                            </div>
+                            <div class="ev-lateral-data">
+                                @(tipo.ProximaData.HasValue
+                                    ? tipo.ProximaData.Value.ToString("dd 'de' MMMM 'de' yyyy", culture)
+                                    : tipo.DataHora.ToString("dd 'de' MMMM 'de' yyyy", culture))
+                            </div>
+                            <div class="ev-lateral-hora">
+                                &#9210;
+                                @(tipo.ProximaData.HasValue
+                                    ? tipo.ProximaData.Value.ToString("HH:mm")
+                                    : tipo.DataHora.ToString("HH:mm"))
+                            </div>
+                            <a asp-action="Calendario" class="ev-lateral-link">ver no calendário &rarr;</a>
+                        </div>
                         <div class="ev-lateral-numero">
                             @(tipo.ProximaData.HasValue
                                 ? tipo.ProximaData.Value.ToString("dd")

@@ -21,65 +21,61 @@ namespace IBNB.Controllers
         }
 
         // GET: Eventos
-        // Vitrine dos eventos da igreja (layout alternado / scrollytelling).
-        // Eventos recorrentes que se repetem várias vezes são exibidos UMA única vez.
+        // Vitrine dos PRÓXIMOS eventos (layout alternado / scrollytelling).
+        // Regras: janela de 15 dias a partir de hoje, no máximo 5 cards,
+        // sem repetir o mesmo tipo de evento.
         public async Task<IActionResult> Index()
         {
             var hoje = DateTime.Today;
             var culture = new System.Globalization.CultureInfo("pt-BR");
 
-            var eventos = await _context.Eventos
-                .OrderBy(e => e.DataHora)
-                .ToListAsync();
+            // Janela de busca: hoje até hoje + 15 dias
+            var fimJanela = hoje.AddDays(JanelaDias);
 
-            // Agrupa pelo título normalizado: "Culto de Ensino" cadastrado 40 vezes
-            // continua sendo UM card na vitrine.
-            var vitrine = eventos
-                .GroupBy(e => (e.Titulo ?? string.Empty).Trim(), StringComparer.OrdinalIgnoreCase)
-                .Select(g =>
-                {
-                    var primeiro = g.First();
-                    var tipo = TipoOcorrencia(primeiro, primeiro.DataHora);
+            var eventos = await _context.Eventos.ToListAsync();
 
-                    // Próxima ocorrência a partir de hoje (janela de 1 ano)
-                    var proxima = g
-                        .SelectMany(ev => OcorrenciasNoPeriodo(ev, hoje, hoje.AddYears(1)))
-                        .OrderBy(d => d)
-                        .FirstOrDefault();
-
-                    // Se não houver próxima (evento passado), usa a data base
-                    DateTime? proximaData = proxima == default ? null : proxima;
-
-                    var descricao = g
-                        .Select(e => e.Descricao)
-                        .FirstOrDefault(d => !string.IsNullOrWhiteSpace(d)) ?? string.Empty;
-
-                    var local = g
-                        .Select(e => e.Local)
-                        .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l)) ?? string.Empty;
-
-                    return new EventoVitrineViewModel
-                    {
-                        Titulo = primeiro.Titulo,
-                        Descricao = descricao,
-                        Local = local,
-                        DataHora = primeiro.DataHora,
-                        ProximaData = proximaData,
-                        Subtipo = tipo,
-                        Destaque = tipo is "Ceia" or "Virada",
-                        ResumoRecorrencia = ResumoRecorrencia(primeiro),
-                        OcorrenciasCadastradas = g.Count()
-                    };
-                })
-                // Ordem de exibição: destaque (Ceia/Virada) por último, depois por horário
-                .OrderBy(v => v.Destaque ? 1 : 0)
-                .ThenBy(v => v.DataHora.TimeOfDay)
-                .ThenBy(v => v.Titulo)
+            // Todas as ocorrências dentro da janela, ordenadas por data
+            var ocorrencias = eventos
+                .SelectMany(ev => OcorrenciasNoPeriodo(ev, hoje, fimJanela)
+                    .Select(data => new { Evento = ev, Data = data }))
+                .OrderBy(o => o.Data)
                 .ToList();
 
-            var vm = new EventosIndexViewModel
+            // Mantém apenas a PRIMEIRA ocorrência de cada tipo (sem repetir),
+            // respeitando o limite de 5 cards.
+            var selecionados = new List<ViewModels.EventoVitrineViewModel>();
+            var titulosUsados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var oc in ocorrencias)
             {
-                Tipos = vitrine,
+                if (selecionados.Count >= MaxCards) break;
+
+                var chave = (oc.Evento.Titulo ?? string.Empty).Trim();
+                if (!titulosUsados.Add(chave)) continue;
+
+                var tipo = TipoOcorrencia(oc.Evento, oc.Data);
+                var descricao = eventos
+                    .Where(e => string.Equals((e.Titulo ?? "").Trim(), chave, StringComparison.OrdinalIgnoreCase))
+                    .Select(e => e.Descricao)
+                    .FirstOrDefault(d => !string.IsNullOrWhiteSpace(d)) ?? string.Empty;
+
+                selecionados.Add(new ViewModels.EventoVitrineViewModel
+                {
+                    Titulo = tipo == "Virada" ? "Culto da Virada + Ceia do Senhor" : oc.Evento.Titulo,
+                    Descricao = descricao,
+                    Local = oc.Evento.Local,
+                    DataHora = oc.Data,
+                    ProximaData = oc.Data,
+                    Subtipo = tipo,
+                    Destaque = tipo is "Ceia" or "Virada",
+                    ResumoRecorrencia = ResumoRecorrencia(oc.Evento),
+                    OcorrenciasCadastradas = 1
+                });
+            }
+
+            var vm = new ViewModels.EventosIndexViewModel
+            {
+                Tipos = selecionados,
                 Hoje = DateTime.Now,
                 NomeMes = hoje.ToString("MMMM 'de' yyyy", culture),
                 PodeCriarEvento = User?.Identity?.IsAuthenticated ?? false
@@ -88,6 +84,9 @@ namespace IBNB.Controllers
             return View(vm);
         }
 
+        // Regras da vitrine
+        private const int JanelaDias = 15;
+        private const int MaxCards = 5;
         // Resumo legível da recorrência de um evento
         private static string ResumoRecorrencia(Evento ev)
         {
