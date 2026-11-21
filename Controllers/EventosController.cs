@@ -21,12 +21,172 @@ namespace IBNB.Controllers
         }
 
         // GET: Eventos
+        // Vitrine dos eventos da igreja (layout alternado / scrollytelling).
+        // Eventos recorrentes que se repetem várias vezes são exibidos UMA única vez.
         public async Task<IActionResult> Index()
         {
+            var hoje = DateTime.Today;
+            var culture = new System.Globalization.CultureInfo("pt-BR");
+
             var eventos = await _context.Eventos
                 .OrderBy(e => e.DataHora)
                 .ToListAsync();
-            return View(eventos);
+
+            // Agrupa pelo título normalizado: "Culto de Ensino" cadastrado 40 vezes
+            // continua sendo UM card na vitrine.
+            var vitrine = eventos
+                .GroupBy(e => (e.Titulo ?? string.Empty).Trim(), StringComparer.OrdinalIgnoreCase)
+                .Select(g =>
+                {
+                    var primeiro = g.First();
+                    var tipo = TipoOcorrencia(primeiro, primeiro.DataHora);
+
+                    // Próxima ocorrência a partir de hoje (janela de 1 ano)
+                    var proxima = g
+                        .SelectMany(ev => OcorrenciasNoPeriodo(ev, hoje, hoje.AddYears(1)))
+                        .OrderBy(d => d)
+                        .FirstOrDefault();
+
+                    // Se não houver próxima (evento passado), usa a data base
+                    DateTime? proximaData = proxima == default ? null : proxima;
+
+                    var descricao = g
+                        .Select(e => e.Descricao)
+                        .FirstOrDefault(d => !string.IsNullOrWhiteSpace(d)) ?? string.Empty;
+
+                    var local = g
+                        .Select(e => e.Local)
+                        .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l)) ?? string.Empty;
+
+                    return new EventoVitrineViewModel
+                    {
+                        Titulo = primeiro.Titulo,
+                        Descricao = descricao,
+                        Local = local,
+                        DataHora = primeiro.DataHora,
+                        ProximaData = proximaData,
+                        Subtipo = tipo,
+                        Destaque = tipo is "Ceia" or "Virada",
+                        ResumoRecorrencia = ResumoRecorrencia(primeiro),
+                        OcorrenciasCadastradas = g.Count()
+                    };
+                })
+                // Ordem de exibição: destaque (Ceia/Virada) por último, depois por horário
+                .OrderBy(v => v.Destaque ? 1 : 0)
+                .ThenBy(v => v.DataHora.TimeOfDay)
+                .ThenBy(v => v.Titulo)
+                .ToList();
+
+            var vm = new EventosIndexViewModel
+            {
+                Tipos = vitrine,
+                Hoje = DateTime.Now,
+                NomeMes = hoje.ToString("MMMM 'de' yyyy", culture),
+                PodeCriarEvento = User?.Identity?.IsAuthenticated ?? false
+            };
+
+            return View(vm);
+        }
+
+        // Resumo legível da recorrência de um evento
+        private static string ResumoRecorrencia(Evento ev)
+        {
+            var cultura = new System.Globalization.CultureInfo("pt-BR");
+            var hora = ev.DataHora.ToString("HH:mm");
+
+            if (!ev.IsRecorrente)
+                return $"Data única · {ev.DataHora.ToString("dd 'de' MMMM", cultura)} · {hora}";
+
+            var passo = ev.IntervaloRecorrencia <= 0 ? 1 : ev.IntervaloRecorrencia;
+            var tipo = (ev.TipoRecorrencia ?? "Nunca").Trim();
+            var diaSemana = ev.DataHora.ToString("dddd", cultura);
+            var diaMes = ev.DataHora.Day;
+
+            return tipo switch
+            {
+                "Diario" => passo == 1 ? $"Todos os dias, às {hora}" : $"A cada {passo} dias, às {hora}",
+                "SegundaSexta" => $"De segunda a sexta, às {hora}",
+                "Semanal" => passo == 1
+                    ? $"{Artigo(diaSemana)} {SemanaNome(diaSemana)}, às {hora}"
+                    : $"A cada {passo} semanas, {SemanaNome(diaSemana)}, às {hora}",
+                "Mensal" => MontarMensal(ev, passo, hora),
+                "Anual" => $"Todo ano, dia {diaMes:00}/{ev.DataHora.Month:00}, às {hora}",
+                "Personalizado" => (ev.FrequenciaPersonalizada ?? "semana").ToLowerInvariant() switch
+                {
+                    "dia" => passo == 1 ? $"Todos os dias, às {hora}" : $"A cada {passo} dias, às {hora}",
+                    "mes" => passo == 1 ? $"Todo mês, dia {diaMes:00}, às {hora}" : $"A cada {passo} meses, às {hora}",
+                    "ano" => $"A cada {passo} ano(s), às {hora}",
+                    _ => passo == 1 ? $"{Artigo(diaSemana)} {SemanaNome(diaSemana)}, às {hora}" : $"A cada {passo} semanas, às {hora}"
+                },
+                _ => $"Data única · {ev.DataHora.ToString("dd 'de' MMMM", cultura)} · {hora}"
+            };
+        }
+
+        // "Todo 1º domingo do mês, às 19:00"
+        private static string MontarMensal(Evento ev, int passo, string hora)
+        {
+            var cultura = new System.Globalization.CultureInfo("pt-BR");
+            var nomeDia = SemanaNome(ev.DataHora.ToString("dddd", cultura));
+
+            if (ev.IndiceSemana.HasValue && ev.DiaDaSemana.HasValue)
+            {
+                var indice = ev.IndiceSemana.Value;
+                var rotuloIndice = indice switch
+                {
+                    1 => "1º",
+                    2 => "2º",
+                    3 => "3º",
+                    4 => "4º",
+                    5 => "5º",
+                    _ => "último"
+                };
+                var alvo = SemanaNomeEmPortugues(ev.DiaDaSemana.Value);
+                var cadencia = passo == 1 ? "Todo" : $"A cada {passo} meses,";
+                return $"{cadencia} {rotuloIndice} {alvo} do mês, às {hora}";
+            }
+
+            return passo == 1
+                ? $"Todo mês, dia {ev.DataHora.Day:00}, às {hora}"
+                : $"A cada {passo} meses, {nomeDia}, às {hora}";
+        }
+
+        // Converte o enum DayOfWeek (em inglês) para o nome em português
+        private static string SemanaNomeEmPortugues(DayOfWeek dia) => dia switch
+        {
+            DayOfWeek.Sunday => "domingo",
+            DayOfWeek.Monday => "segunda-feira",
+            DayOfWeek.Tuesday => "terça-feira",
+            DayOfWeek.Wednesday => "quarta-feira",
+            DayOfWeek.Thursday => "quinta-feira",
+            DayOfWeek.Friday => "sexta-feira",
+            DayOfWeek.Saturday => "sábado",
+            _ => "domingo"
+        };
+
+        // "Todo domingo" / "Toda quarta-feira" - concordância correta
+        private static string Artigo(string dia)
+        {
+            var d = (dia ?? string.Empty).Trim().ToLowerInvariant();
+            return d.StartsWith("sáb") || d.StartsWith("sab") || d.StartsWith("seg")
+                || d.StartsWith("ter") || d.StartsWith("qua") || d.StartsWith("sex")
+                ? "Toda"
+                : "Todo";
+        }
+
+        private static string SemanaNome(string dia)
+        {
+            var d = (dia ?? string.Empty).Trim().ToLowerInvariant();
+            return d switch
+            {
+                "domingo" => "domingo",
+                "segunda-feira" or "segunda" => "segunda-feira",
+                "terça-feira" or "terça" or "terca" => "terça-feira",
+                "quarta-feira" or "quarta" => "quarta-feira",
+                "quinta-feira" or "quinta" => "quinta-feira",
+                "sexta-feira" or "sexta" => "sexta-feira",
+                "sábado" or "sabado" => "sábado",
+                _ => d
+            };
         }
 
         [Authorize]

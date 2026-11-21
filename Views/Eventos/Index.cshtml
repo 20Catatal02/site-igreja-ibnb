@@ -1,110 +1,344 @@
-@model IEnumerable<IBNB.Models.Evento>
+@model IBNB.ViewModels.EventosIndexViewModel
 
 @{
-    ViewData["Title"] = "Eventos e Agenda";
-    var hoje = DateTime.Now;
-    var primeiroDiaDoMes = new DateTime(hoje.Year, hoje.Month, 1);
-    int diasNoMes = DateTime.DaysInMonth(hoje.Year, hoje.Month);
-    int diaSemanaInicio = (int)primeiroDiaDoMes.DayOfWeek;
+    ViewData["Title"] = "Eventos";
+
+    var corEvento = "#198754";
+    var corCeia = "#facc15";
     var culture = new System.Globalization.CultureInfo("pt-BR");
-    string nomeMes = hoje.ToString("MMMM yyyy", culture);
 }
 
-<div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="text-primary mb-1">Agenda de Eventos</h2>
-            <p class="text-muted mb-0">Gestão de cultos, programações e calendário geral.</p>
-        </div>
-        <div>
-            <a asp-action="Calendario" class="btn btn-primary me-2">Ver Calendário Unificado</a>
-            <a asp-action="Create" class="btn btn-success">Novo Evento</a>
-        </div>
-    </div>
+<style>
+    /* ===== Vitrine de eventos: layout alternado (scrollytelling) ===== */
+    .ev-hero {
+        padding: 3rem 0 2rem;
+        text-align: center;
+    }
+    .ev-hero h1 {
+        font-weight: 800;
+        letter-spacing: -.02em;
+        color: #fff;
+        margin-bottom: .75rem;
+    }
+    .ev-hero p {
+        color: #9aa4ae;
+        max-width: 620px;
+        margin: 0 auto 1.75rem;
+        font-size: 1.02rem;
+    }
+    .ev-acoes {
+        display: inline-flex;
+        gap: .6rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 
-    <!-- Pré-visualização do Calendário do Mês -->
-    <div class="card shadow border-0 p-4 bg-dark text-light mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="text-capitalize text-light mb-0">Calendário de @nomeMes</h4>
-            <span class="badge bg-secondary">Pré-visualização Mensal</span>
-        </div>
+    /* Linha do "scrollytelling" */
+    .ev-trilha {
+        position: relative;
+        padding-bottom: 2rem;
+    }
+    /* Linha vertical central, apenas no desktop */
+    .ev-trilha::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 2px;
+        transform: translateX(-50%);
+        background: linear-gradient(to bottom,
+            rgba(25, 135, 84, 0) 0%,
+            rgba(25, 135, 84, .55) 8%,
+            rgba(25, 135, 84, .55) 92%,
+            rgba(25, 135, 84, 0) 100%);
+    }
 
-        <div class="table-responsive">
-            <table class="table table-bordered text-center text-light align-middle border-secondary">
-                <thead class="table-dark">
-                    <tr>
-                        <th class="text-danger">Dom</th>
-                        <th>Seg</th>
-                        <th>Ter</th>
-                        <th>Qua</th>
-                        <th>Qui</th>
-                        <th>Sex</th>
-                        <th>Sáb</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        int diaAtual = 1;
-                        int linhas = (int)Math.Ceiling((diasNoMes + diaSemanaInicio) / 7.0);
-                        for (int i = 0; i < linhas; i++)
+    .ev-bloco {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        align-items: center;
+        margin-bottom: 3rem;
+    }
+
+    /* Marcador na linha central */
+    .ev-ponto {
+        display: none;
+    }
+
+    .ev-card {
+        background-color: #212529;
+        border: 1px solid #3a3f45;
+        border-radius: .9rem;
+        padding: 1.6rem 1.7rem;
+        transition: border-color .25s ease, transform .25s ease;
+    }
+    .ev-card:hover {
+        border-color: #198754;
+        transform: translateY(-3px);
+    }
+    .ev-card.destaque {
+        border-color: #a16207;
+        box-shadow: 0 0 0 1px rgba(250, 204, 21, .35) inset;
+        background-image: repeating-linear-gradient(45deg,
+            rgba(250, 204, 21, .05),
+            rgba(250, 204, 21, .05) 8px,
+            rgba(234, 179, 8, .09) 8px,
+            rgba(234, 179, 8, .09) 16px);
+    }
+
+    .ev-tag {
+        display: inline-block;
+        font-size: .68rem;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        padding: .22rem .6rem;
+        border-radius: 999px;
+        background-color: rgba(25, 135, 84, .18);
+        color: #4ade80;
+        border: 1px solid rgba(25, 135, 84, .5);
+        margin-bottom: .7rem;
+    }
+    .ev-card.destaque .ev-tag {
+        background-color: rgba(250, 204, 21, .16);
+        color: #facc15;
+        border-color: rgba(250, 204, 21, .55);
+    }
+
+    .ev-titulo {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: .55rem;
+        line-height: 1.25;
+    }
+    .ev-desc {
+        color: #adb5bd;
+        font-size: .93rem;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .ev-meta {
+        display: flex;
+        flex-direction: column;
+        gap: .4rem;
+        font-size: .86rem;
+        color: #ced4da;
+    }
+    .ev-meta-linha {
+        display: flex;
+        align-items: flex-start;
+        gap: .5rem;
+    }
+    .ev-meta-icone {
+        color: #198754;
+        flex: 0 0 1rem;
+        font-weight: 700;
+    }
+    .ev-card.destaque .ev-meta-icone {
+        color: #facc15;
+    }
+
+    /* "Próximo" como selo */
+    .ev-proximo {
+        display: inline-block;
+        margin-top: .9rem;
+        font-size: .78rem;
+        font-weight: 600;
+        padding: .3rem .7rem;
+        border-radius: .45rem;
+        background-color: rgba(13, 110, 253, .15);
+        border: 1px solid rgba(13, 110, 253, .45);
+        color: #6ea8fe;
+    }
+
+    /* Painel lateral (o "vazio" do layout alternado, preenchido com um detalhe) */
+    .ev-lateral {
+        display: none;
+    }
+    .ev-lateral-numero {
+        font-size: 4.2rem;
+        font-weight: 800;
+        line-height: 1;
+        color: #2c3136;
+        letter-spacing: -.04em;
+    }
+
+    /* ===== Desktop: alterna esquerda / direita ===== */
+    @@media (min-width: 768px) {
+        .ev-bloco {
+            grid-template-columns: 1fr 84px 1fr;
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+        .ev-ponto {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            grid-column: 2;
+            grid-row: 1;
+        }
+        .ev-ponto span {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #198754;
+            box-shadow: 0 0 0 5px #1b1f23, 0 0 0 6px #3a3f45;
+        }
+        .ev-bloco.destaque .ev-ponto span {
+            background-color: #facc15;
+            box-shadow: 0 0 0 5px #1b1f23, 0 0 0 6px #a16207;
+        }
+
+        /* Blocos ímpares: card à esquerda, detalhe à direita */
+        .ev-bloco:nth-of-type(odd) .ev-card { grid-column: 1; grid-row: 1; }
+        .ev-bloco:nth-of-type(odd) .ev-lateral {
+            grid-column: 3;
+            grid-row: 1;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: 1.5rem;
+        }
+
+        /* Blocos pares: card à direita, detalhe à esquerda */
+        .ev-bloco:nth-of-type(even) .ev-card { grid-column: 3; grid-row: 1; }
+        .ev-bloco:nth-of-type(even) .ev-lateral {
+            grid-column: 1;
+            grid-row: 1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-right: 1.5rem;
+        }
+    }
+
+    .ev-vazio {
+        text-align: center;
+        padding: 4rem 1rem;
+        color: #9aa4ae;
+    }
+</style>
+
+<div class="container">
+
+    <!-- Cabeçalho -->
+    <section class="ev-hero">
+        <h1>Eventos da Igreja</h1>
+        <p>
+            Conheça as programações que acontecem em nossa igreja.
+            Cada uma é exibida uma única vez, com o resumo da sua frequência.
+        </p>
+        <div class="ev-acoes">
+            <a asp-action="Calendario" class="btn btn-primary px-4">Calendário</a>
+            @if (Model.PodeCriarEvento)
+            {
+                <a asp-action="Create" class="btn btn-success px-4">Novo Evento</a>
+            }
+        </div>
+        @if (!Model.PodeCriarEvento)
+        {
+            <div class="mt-3">
+                <small class="text-white-50">
+                    Para adicionar um novo evento é necessário
+                    <a asp-area="Identity" asp-page="/Account/Login" class="link-light text-decoration-underline">entrar</a>
+                    com uma conta cadastrada.
+                </small>
+            </div>
+        }
+    </section>
+
+    @if (!Model.Tipos.Any())
+    {
+        <div class="ev-vazio">
+            <h4 class="text-white">Nenhuma programação cadastrada</h4>
+            <p class="mb-0">Assim que os eventos forem adicionados, eles aparecerão aqui.</p>
+        </div>
+    }
+    else
+    {
+        <div class="ev-trilha">
+            @foreach (var tipo in Model.Tipos)
+            {
+                var diasParaProximo = tipo.ProximaData.HasValue
+                    ? (tipo.ProximaData.Value.Date - Model.Hoje.Date).Days
+                    : (int?)null;
+
+                <div class="ev-bloco @(tipo.Destaque ? "destaque" : "")">
+
+                    <!-- Card do evento -->
+                    <div class="ev-card @(tipo.Destaque ? "destaque" : "")">
+                        <span class="ev-tag">@tipo.Tag</span>
+
+                        <h3 class="ev-titulo">@tipo.Titulo</h3>
+
+                        @if (!string.IsNullOrWhiteSpace(tipo.Descricao))
                         {
-                            <tr>
-                                @for (int j = 0; j < 7; j++)
-                                {
-                                    if ((i == 0 && j < diaSemanaInicio) || diaAtual > diasNoMes)
-                                    {
-                                        <td class="text-muted bg-opacity-25">-</td>
-                                    }
-                                    else
-                                    {
-                                        bool ehHoje = (diaAtual == hoje.Day);
-                                        string classeCss = ehHoje ? "bg-primary text-white fw-bold rounded py-3" : "py-3";
-                                        <td class="@classeCss">
-                                            <span>@diaAtual</span>
-                                        </td>
-                                        diaAtual++;
-                                    }
-                                }
-                            </tr>
+                            <p class="ev-desc">@tipo.Descricao</p>
                         }
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
+                        else
+                        {
+                            <p class="ev-desc fst-italic text-white-50">
+                                Uma programação especial da nossa igreja.
+                            </p>
+                        }
 
-    <!-- Lista de Eventos Cadastrados -->
-    <div class="card shadow border-0 p-4">
-        <h4 class="mb-3 text-light">Lista de Eventos Cadastrados</h4>
-        <table class="table table-hover align-middle table-dark">
-            <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Data e Hora</th>
-                    <th>Local</th>
-                    <th>Recorrência</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Any())
-                {
-                    <tr>
-                        <td colspan="4" class="text-center text-muted py-4">Nenhum evento cadastrado.</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var item in Model)
-                    {
-                        <tr>
-                            <td class="fw-bold">@item.Titulo</td>
-                            <td>@item.DataHora.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td>@item.Local</td>
-                            <td><span class="badge bg-info text-dark">@item.TipoRecorrencia</span></td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
+                        <div class="ev-meta">
+                            <div class="ev-meta-linha">
+                                <span class="ev-meta-icone">&#9210;</span>
+                                <span>@tipo.ResumoRecorrencia</span>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(tipo.Local))
+                            {
+                                <div class="ev-meta-linha">
+                                    <span class="ev-meta-icone">&#9906;</span>
+                                    <span>@tipo.Local</span>
+                                </div>
+                            }
+                        </div>
+
+                        @if (diasParaProximo.HasValue)
+                        {
+                            <span class="ev-proximo">
+                                Próximo:
+                                @if (diasParaProximo == 0)
+                                {
+                                    @:hoje
+                                }
+                                else if (diasParaProximo == 1)
+                                {
+                                    @:amanhã
+                                }
+                                else
+                                {
+                                    @($"{tipo.ProximaData!.Value.ToString("dd/MM", culture)} · em {diasParaProximo} dias")
+                                }
+                            </span>
+                        }
+                    </div>
+
+                    <!-- Marcador central (desktop) -->
+                    <div class="ev-ponto"><span></span></div>
+
+                    <!-- Detalhe lateral (desktop) -->
+                    <div class="ev-lateral">
+                        <div class="ev-lateral-numero">
+                            @(tipo.ProximaData.HasValue
+                                ? tipo.ProximaData.Value.ToString("dd")
+                                : tipo.DataHora.ToString("dd"))
+                            <div class="text-uppercase" style="font-size:.8rem; letter-spacing:.15em; color:#6c757d;">
+                                @(tipo.ProximaData.HasValue
+                                    ? tipo.ProximaData.Value.ToString("MMM", culture)
+                                    : tipo.DataHora.ToString("MMM", culture))
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
