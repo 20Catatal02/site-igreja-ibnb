@@ -160,51 +160,6 @@
     .ev-lateral {
         display: none;
     }
-    .ev-lateral-numero {
-        font-size: 4.2rem;
-        font-weight: 800;
-        line-height: 1;
-        color: #2c3136;
-        letter-spacing: -.04em;
-    }
-    /* Caixa de detalhe que preenche o lado vazio do layout alternado */
-    .ev-lateral-caixa {
-        display: flex;
-        flex-direction: column;
-        gap: .2rem;
-    }
-    .ev-lateral-dia {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #e9ecef;
-        text-transform: capitalize;
-        line-height: 1.2;
-    }
-    .ev-lateral-data {
-        font-size: .88rem;
-        color: #9aa4ae;
-        text-transform: capitalize;
-    }
-    .ev-lateral-hora {
-        font-size: .95rem;
-        font-weight: 600;
-        color: #198754;
-        margin-top: .4rem;
-    }
-    .ev-card.destaque ~ .ev-lateral .ev-lateral-hora {
-        color: #facc15;
-    }
-    .ev-lateral-link {
-        margin-top: .75rem;
-        font-size: .78rem;
-        color: #6ea8fe;
-        text-decoration: none;
-        width: fit-content;
-    }
-    .ev-lateral-link:hover {
-        text-decoration: underline;
-        color: #9ec5fe;
-    }
     /* Mobile/tablet: a data aparece dentro do card */
     .ev-data {
         text-transform: capitalize;
@@ -215,7 +170,7 @@
         .ev-bloco {
             grid-template-columns: 1fr 84px 1fr;
             gap: 1.5rem;
-            margin-bottom: 4rem;
+            margin-bottom: 2.5rem;
         }
         .ev-ponto {
             display: flex;
@@ -230,6 +185,7 @@
             border-radius: 50%;
             background-color: #198754;
             box-shadow: 0 0 0 5px #1b1f23, 0 0 0 6px #3a3f45;
+            transition: background-color .3s ease, box-shadow .3s ease, transform .3s ease;
         }
         .ev-bloco.destaque .ev-ponto span {
             background-color: #facc15;
@@ -256,6 +212,132 @@
             justify-content: flex-end;
             align-items: center;
             padding-right: 1.5rem;
+        }
+    }
+
+    /* ===== Microinterações ===== */
+
+    /* O bloco inteiro reage ao hover do card: a linha central ganha destaque
+       e o ponto acende. */
+    .ev-bloco {
+        --ev-cor: #198754;
+    }
+    .ev-bloco.destaque {
+        --ev-cor: #facc15;
+    }
+
+    /* Linha central com destaque suave ao passar o mouse no bloco */
+    .ev-bloco::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 2px;
+        transform: translateX(-50%) scaleY(.35);
+        transform-origin: center;
+        background-color: var(--ev-cor);
+        opacity: 0;
+        transition: opacity .35s ease, transform .45s ease;
+        pointer-events: none;
+    }
+    .ev-bloco:hover::after {
+        opacity: .5;
+        transform: translateX(-50%) scaleY(1);
+    }
+
+    /* Ponto central acendendo */
+    .ev-bloco:hover .ev-ponto span {
+        background-color: #4ade80;
+        box-shadow: 0 0 0 5px #1b1f23, 0 0 0 6px var(--ev-cor), 0 0 18px 2px rgba(74, 222, 128, .55);
+        transform: scale(1.18);
+    }
+    .ev-bloco.destaque:hover .ev-ponto span {
+        background-color: #fde047;
+        box-shadow: 0 0 0 5px #1b1f23, 0 0 0 6px #a16207, 0 0 18px 2px rgba(250, 204, 21, .55);
+    }
+
+    /* Card: elevação e borda suave */
+    .ev-card {
+        transition: border-color .3s ease, transform .3s ease, box-shadow .3s ease;
+    }
+    .ev-bloco:hover .ev-card {
+        border-color: var(--ev-cor);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, .45);
+    }
+
+    /* Marco lateral também responde */
+    .ev-bloco:hover .ev-marco-dia {
+        color: #fff;
+    }
+    .ev-bloco:hover .ev-marco-linha {
+        width: 56px;
+        background-color: var(--ev-cor);
+        opacity: .85;
+    }
+
+    /* ===== Marco visual lateral ===== */
+    .ev-marco {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .1rem;
+        user-select: none;
+    }
+    .ev-marco-dia {
+        font-size: 2.6rem;
+        font-weight: 800;
+        line-height: 1;
+        color: #495057;
+        letter-spacing: -.03em;
+        transition: color .3s ease;
+    }
+    .ev-marco-mes {
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: #6c757d;
+    }
+    .ev-marco-linha {
+        display: block;
+        width: 32px;
+        height: 2px;
+        margin-top: .55rem;
+        border-radius: 2px;
+        background-color: #343a40;
+        opacity: .7;
+        transition: width .35s ease, background-color .3s ease, opacity .3s ease;
+    }
+
+    /* Rótulos de metadados */
+    .ev-meta-rotulo {
+        flex: 0 0 3.6rem;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+        color: #6c757d;
+        padding-top: .1rem;
+    }
+    .ev-agora {
+        margin-left: .35rem;
+        font-size: .78rem;
+        font-weight: 700;
+        color: #4ade80;
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .ev-card,
+        .ev-bloco::after,
+        .ev-marco-dia,
+        .ev-marco-linha,
+        .ev-ponto span {
+            transition: none;
+        }
+        .ev-bloco:hover .ev-card {
+            transform: none;
         }
     }
 
@@ -331,27 +413,27 @@
 
                         <div class="ev-meta">
                             <div class="ev-meta-linha">
-                                <span class="ev-meta-icone">&#128197;</span>
+                                <span class="ev-meta-rotulo">Data</span>
                                 <span class="ev-data">
                                     @tipo.DataHora.ToString("dddd, dd 'de' MMMM", culture)
                                     @if (tipo.DataHora.Date == Model.Hoje.Date)
                                     {
-                                        <strong class="text-success">· hoje</strong>
+                                        <strong class="ev-agora">hoje</strong>
                                     }
                                     else if (tipo.DataHora.Date == Model.Hoje.Date.AddDays(1))
                                     {
-                                        <strong class="text-success">· amanhã</strong>
+                                        <strong class="ev-agora">amanhã</strong>
                                     }
                                 </span>
                             </div>
                             <div class="ev-meta-linha">
-                                <span class="ev-meta-icone">&#9210;</span>
+                                <span class="ev-meta-rotulo">Horário</span>
                                 <span>@tipo.ResumoRecorrencia</span>
                             </div>
                             @if (!string.IsNullOrWhiteSpace(tipo.Local))
                             {
                                 <div class="ev-meta-linha">
-                                    <span class="ev-meta-icone">&#9906;</span>
+                                    <span class="ev-meta-rotulo">Local</span>
                                     <span>@tipo.Local</span>
                                 </div>
                             }
@@ -380,36 +462,20 @@
                     <!-- Marcador central (desktop) -->
                     <div class="ev-ponto"><span></span></div>
 
-                    <!-- Detalhe lateral (desktop): preenche o espaço vago -->
+                    <!-- Marco visual lateral (desktop) -->
                     <div class="ev-lateral">
-                        <div class="ev-lateral-caixa">
-                            <div class="ev-lateral-dia">
+                        <div class="ev-marco">
+                            <span class="ev-marco-dia">
                                 @(tipo.ProximaData.HasValue
-                                    ? tipo.ProximaData.Value.ToString("dddd", culture)
-                                    : tipo.DataHora.ToString("dddd", culture))
-                            </div>
-                            <div class="ev-lateral-data">
-                                @(tipo.ProximaData.HasValue
-                                    ? tipo.ProximaData.Value.ToString("dd 'de' MMMM 'de' yyyy", culture)
-                                    : tipo.DataHora.ToString("dd 'de' MMMM 'de' yyyy", culture))
-                            </div>
-                            <div class="ev-lateral-hora">
-                                &#9210;
-                                @(tipo.ProximaData.HasValue
-                                    ? tipo.ProximaData.Value.ToString("HH:mm")
-                                    : tipo.DataHora.ToString("HH:mm"))
-                            </div>
-                            <a asp-action="Calendario" class="ev-lateral-link">ver no calendário &rarr;</a>
-                        </div>
-                        <div class="ev-lateral-numero">
-                            @(tipo.ProximaData.HasValue
-                                ? tipo.ProximaData.Value.ToString("dd")
-                                : tipo.DataHora.ToString("dd"))
-                            <div class="text-uppercase" style="font-size:.8rem; letter-spacing:.15em; color:#6c757d;">
+                                    ? tipo.ProximaData.Value.ToString("dd", culture)
+                                    : tipo.DataHora.ToString("dd", culture))
+                            </span>
+                            <span class="ev-marco-mes">
                                 @(tipo.ProximaData.HasValue
                                     ? tipo.ProximaData.Value.ToString("MMM", culture)
                                     : tipo.DataHora.ToString("MMM", culture))
-                            </div>
+                            </span>
+                            <span class="ev-marco-linha"></span>
                         </div>
                     </div>
                 </div>
