@@ -1,14 +1,30 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using IBNB.Data;
 using IBNB.Models;
+using System.Diagnostics;
 
 namespace IBNB.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index()
+    private readonly AppDbContext _context;
+
+    public HomeController(AppDbContext context)
     {
-        return View();
+        _context = context;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        // Busca os próximos 3 eventos a partir de hoje
+        var proximosEventos = await _context.Eventos
+            .Where(e => e.DataHora >= DateTime.Today)
+            .OrderBy(e => e.DataHora)
+            .Take(3)
+            .ToListAsync();
+
+        return View(proximosEventos);
     }
 
     public IActionResult Privacy()

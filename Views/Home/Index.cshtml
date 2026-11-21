@@ -1,58 +1,119 @@
-﻿@{
-    ViewData["Title"] = "Bem-vindo";
+﻿@model IEnumerable<IBNB.Models.Evento>
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Início";
 }
 
 <!-- HERO SECTION -->
-<div class="row justify-content-center mb-5 mt-4">
-    <div class="col-lg-10">
-        <div class="card bg-dark border-secondary shadow-lg">
-            <div class="card-body p-5 text-center">
-                <h1 class="display-4 fw-bold text-primary mb-3">Bem-vindo à IBNB</h1>
-                <p class="lead text-light mb-4">Sistema de Gestão e Agenda Unificada para a nossa comunidade.</p>
-                
-                <div class="d-inline-block bg-secondary bg-opacity-25 rounded px-4 py-3 mb-4 border border-secondary">
-                    <span class="text-light-50 d-block text-uppercase small">Data de Hoje</span>
-                    <span class="fs-4 fw-bold text-white">@DateTime.Now.ToString("dddd, dd 'De' MMMM 'De' yyyy")</span>
-                </div>
-
-                <div class="d-flex justify-content-center gap-3">
-                    <a asp-controller="Eventos" asp-action="Calendario" class="btn btn-primary btn-lg px-4">
-                        Ver Calendário
-                    </a>
-                    <a asp-controller="Aniversariantes" asp-action="Index" class="btn btn-outline-light btn-lg px-4">
-                        Aniversariantes
-                    </a>
-                </div>
-            </div>
+<div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark rounded-4 border border-secondary shadow-lg">
+    <div class="col-md-8 p-lg-5 mx-auto my-5">
+        <h1 class="display-4 fw-bold text-primary mb-3">Bem-vindo à IBNB</h1>
+        <p class="lead text-light mb-4">Um lugar de fé, comunhão e crescimento espiritual. Venha fazer parte da nossa família.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a class="btn btn-primary btn-lg px-4" asp-controller="Eventos" asp-action="Calendario">Ver Calendário</a>
+            <a class="btn btn-outline-light btn-lg px-4" href="#sobre">Conheça a Igreja</a>
         </div>
     </div>
 </div>
 
-<!-- FUNCIONALIDADES -->
-<h3 class="text-center mb-4 text-light">O que você encontra aqui</h3>
-<div class="row g-4 mb-5">
-    <div class="col-md-4">
-        <div class="card h-100 bg-dark border-secondary text-center p-3">
-            <div class="card-body">
-                <h4 class="card-title text-primary mb-3">Agenda Unificada</h4>
-                <p class="card-text text-light-50">Acompanhe os cultos, eventos da igreja e feriados nacionais num só lugar.</p>
+<div class="container marketing my-5">
+
+    <!-- SEÇÃO: HISTÓRIA / SOBRE -->
+    <div class="row align-items-center mb-5" id="sobre">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <!-- Substitua o src por uma foto real da fachada da igreja futuramente -->
+            <img src="https://images.unsplash.com/photo-1438032005730-c779502df39b?q=80&w=1471&auto=format&fit=crop" 
+                 class="img-fluid rounded-4 border border-secondary shadow" alt="Interior da Igreja">
+        </div>
+        <div class="col-md-6 text-light px-md-5">
+            <h2 class="fw-bold mb-3 text-white">Nossa História</h2>
+            <p class="text-white-50">Fundada com o propósito de pregar o evangelho de Cristo e servir à comunidade, a IBNB tem sido um farol de esperança ao longo dos anos.</p>
+            <p class="text-white-50">Acreditamos no amor ao próximo, no poder da oração e na transformação de vidas através da Palavra de Deus. Nossa porta está sempre aberta para acolher você e sua família.</p>
+        </div>
+    </div>
+
+    <!-- SEÇÃO: LIDERANÇA / PASTORES -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-white mb-4">Nossa Liderança</h2>
+        <p class="text-white-50 mb-5">Conheça os pastores e líderes que dedicam suas vidas ao cuidado do rebanho.</p>
+    </div>
+
+    <div class="row text-center justify-content-center">
+        <!-- Pastor 1 -->
+        <div class="col-lg-4 mb-4">
+            <div class="card bg-dark border-secondary h-100 shadow-sm">
+                <div class="card-body">
+                    <!-- Substitua por foto real -->
+                    <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=1000&auto=format&fit=crop" 
+                         class="rounded-circle mb-3 border border-primary" width="140" height="140" style="object-fit: cover;" alt="Pastor Presidente">
+                    <h4 class="text-white">Pastor João Silva</h4>
+                    <p class="text-primary mb-2">Pastor Presidente</p>
+                    <p class="text-white-50 small">Lidera a igreja com foco na pregação expositiva e no discipulado.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pastor 2 -->
+        <div class="col-lg-4 mb-4">
+            <div class="card bg-dark border-secondary h-100 shadow-sm">
+                <div class="card-body">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop" 
+                         class="rounded-circle mb-3 border border-primary" width="140" height="140" style="object-fit: cover;" alt="Pastor Auxiliar">
+                    <h4 class="text-white">Pastor Marcos Souza</h4>
+                    <p class="text-primary mb-2">Pastor Auxiliar</p>
+                    <p class="text-white-50 small">Responsável pelo ministério de jovens e integração de novos membros.</p>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card h-100 bg-dark border-secondary text-center p-3">
-            <div class="card-body">
-                <h4 class="card-title text-primary mb-3">Aniversariantes</h4>
-                <p class="card-text text-light-50">Veja a lista de irmãos que fazem aniversário e não perca nenhuma data especial.</p>
+
+        <!-- SEÇÃO: PRÓXIMOS EVENTOS (PÚBLICO) -->
+    <div class="row mt-5 mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="fw-bold text-white">Próximos Encontros</h2>
+            <p class="text-white-50">Participe dos nossos cultos e eventos abertos à comunidade.</p>
+        </div>
+        
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var evento in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card bg-dark border-secondary h-100 shadow-sm hover-effect">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-primary">@evento.DataHora.ToString("dd/MM/yyyy")</span>
+                                <span class="text-white-50 small">@evento.DataHora.ToString("HH:mm")</span>
+                            </div>
+                            <h5 class="card-title text-white">@evento.Titulo</h5>
+                            <p class="card-text text-white-50 small mb-3">
+                                <i class="bi bi-geo-alt"></i> @(string.IsNullOrEmpty(evento.Local) ? "IBNB" : evento.Local)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center">
+                <p class="text-white-50">Nenhum evento agendado para os próximos dias.</p>
             </div>
+        }
+        
+        <div class="col-12 text-center mt-3">
+            <a asp-controller="Eventos" asp-action="Calendario" class="btn btn-outline-primary">Ver Calendário Completo</a>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card h-100 bg-dark border-secondary text-center p-3">
-            <div class="card-body">
-                <h4 class="card-title text-primary mb-3">Área Restrita</h4>
-                <p class="card-text text-light-50">Líderes e administradores têm acesso a ferramentas de gestão exclusivas.</p>
-            </div>
+
+    <!-- CALL TO ACTION (CONVITE) -->
+    <div class="row mt-5 p-4 p-md-5 bg-secondary bg-opacity-10 rounded-4 border border-secondary text-center">
+        <div class="col-lg-8 mx-auto">
+            <h2 class="text-white mb-3">Faça-nos uma visita</h2>
+            <p class="text-white-50 mb-4">Nossos cultos acontecem todos os domingos às 18h e quartas-feiras às 20h. Será uma honra receber você.</p>
+            <a asp-controller="Eventos" asp-action="Calendario" class="btn btn-primary">Confira a Agenda Completa</a>
         </div>
     </div>
+
 </div>

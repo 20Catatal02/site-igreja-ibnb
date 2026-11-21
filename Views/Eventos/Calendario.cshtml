@@ -1,60 +1,550 @@
-@model IEnumerable<IBNB.ViewModels.CalendarioItemViewModel>
-
+﻿@model IBNB.ViewModels.CalendarioViewModel
 @{
-    ViewData["Title"] = "Calendário Unificado";
+    ViewData["Title"] = "Eventos";
+    var culture = new System.Globalization.CultureInfo("pt-BR");
+    var diasSemana = new[] { "Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb" };
+
+    var corEvento = "#198754";
+    var corFeriado = "#dc3545";
+    var corAniversario = "#fd7e14";
+    var corCeia = "#facc15";
+
+    var mesAnterior = Model.PrimeiroDia.AddMonths(-1);
+    var mesSeguinte = Model.PrimeiroDia.AddMonths(1);
+    var vaziosIniciais = (int)Model.PrimeiroDia.DayOfWeek;
+
+    // Estamos no mês corrente (hoje)?
+    var mesCorrente = Model.Mes == Model.Hoje.Month && Model.Ano == Model.Hoje.Year;
+
+
 }
 
-<div class="container my-4">
-    <h2 class="mb-4 text-primary">Calendário Unificado</h2>
-    <p class="text-muted">Acompanhe feriados nacionais, eventos da igreja e aniversariantes integrados.</p>
+<style>
+    .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+    }
+    .cal-head {
+        text-align: center;
+        font-weight: 700;
+        font-size: .8rem;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        color: #9aa4ae;
+        padding-bottom: .35rem;
+    }
+    .cal-cell {
+        aspect-ratio: 1 / 1;
+        border: 1px solid #3a3f45;
+        border-radius: .5rem;
+        background-color: #212529;
+        padding: .35rem .4rem;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: border-color .2s ease, transform .2s ease;
+    }
+    .cal-cell:hover {
+        border-color: #0d6efd;
+        transform: translateY(-2px);
+    }
+    .cal-cell.vazio {
+        background-color: transparent;
+        border: 1px dashed #2c3136;
+    }
+    .cal-cell.hoje {
+        border: 2px solid #0d6efd;
+        background-color: #1b2a3d;
+    }
+    .cal-numero {
+        font-weight: 700;
+        font-size: .95rem;
+        color: #e0e0e0;
+        line-height: 1;
+    }
+    .cal-cell.hoje .cal-numero {
+        color: #4da3ff;
+    }
+    .cal-itens {
+        margin-top: .3rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        overflow: hidden;
+    }
+    .cal-item {
+        font-size: .68rem;
+        line-height: 1.15;
+        color: #fff;
+        border-radius: 3px;
+        padding: 1px 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    /* Tarja de destaque: Ceia do Senhor e Virada de Ano (amarelo) */
+    .cal-item.ceia {
+        background-image: repeating-linear-gradient(
+            45deg,
+            @corCeia,
+            @corCeia 6px,
+            #eab308 6px,
+            #eab308 12px);
+        color: #1a1a1a !important;
+        font-weight: 700;
+        border-left: 3px solid #a16207;
+        box-shadow: 0 0 0 1px #a16207 inset;
+    }
+    .cal-item.ceia::before {
+        content: "★ ";
+    }
+    .cal-mais {
+        font-size: .65rem;
+        color: #9aa4ae;
+    }
+    .cal-legenda span.dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 4px;
+        vertical-align: middle;
+    }
+    /* Faixa do bloco "Hoje" para Ceia / Virada de ano */
+    .faixa-ceia {
+        background-image: repeating-linear-gradient(45deg, @corCeia, @corCeia 6px, #eab308 6px, #eab308 12px);
+        color: #1a1a1a;
+        font-weight: 700;
+        border-left: 3px solid #a16207;
+    }
+    /* Lista "Nossa agenda": apenas um pequeno risco na cor do evento */
+    .agenda-item {
+        font-size: .82rem;
+        color: #fff;
+        padding-left: .6rem;
+        border-left: 3px solid transparent;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .agenda-item.verde {
+        border-left-color: @corEvento;
+    }
+    .agenda-item.amarelo {
+        border-left-color: @corCeia;
+    }
+    /* Marcadores coloridos dentro da célula (visíveis também no celular) */
+    .cal-marcadores {
+        margin-top: .2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 3px;
+    }
+    .cal-marcador {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .cal-marcador.mais {
+        width: auto;
+        height: auto;
+        border-radius: 3px;
+        background-color: #495057 !important;
+        color: #fff;
+        font-size: .55rem;
+        line-height: 1;
+        padding: 1px 3px;
+    }
+    .cal-cell.tem-itens {
+        cursor: pointer;
+    }
+    .cal-cell:focus-visible {
+        outline: 2px solid #4da3ff;
+        outline-offset: 2px;
+    }
+    .cal-detalhe {
+        display: none;
+    }
 
-    <div class="card shadow border-0 p-4">
-        <table class="table table-hover align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Data</th>
-                    <th>Título / Descrição</th>
-                    <th>Categoria</th>
-                    <th>Local</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Any())
-                {
-                    <tr>
-                        <td colspan="4" class="text-center text-muted py-4">Nenhum registo encontrado para este período.</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.Data.ToString("dd/MM/yyyy")</td>
-                            <td class="fw-bold">@item.Titulo</td>
-                            <td>
-                                @if (item.Categoria == "Feriado")
+    /* Faixa de resumo do mês */
+    .cal-resumo {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .35rem .9rem;
+        align-items: center;
+        padding: .5rem .75rem;
+        border: 1px solid #3a3f45;
+        border-radius: .5rem;
+        background-color: #212529;
+        color: #e0e0e0;
+        font-size: .8rem;
+    }
+    .cal-resumo-item {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        white-space: nowrap;
+    }
+    .cal-resumo-item strong {
+        color: #fff;
+    }
+    .cal-dia-semana {
+        font-size: .6rem;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        color: #6c757d;
+        line-height: 1;
+        margin-top: 1px;
+    }
+    .cal-cell.hoje .cal-dia-semana {
+        color: #4da3ff;
+    }
+
+    /* Itens do modal (zoom do dia) */
+    .detalhe-linha {
+        border-left: 4px solid #6c757d;
+        padding: .4rem .6rem;
+        margin-bottom: .5rem;
+        background-color: #212529;
+        border-radius: 0 .35rem .35rem 0;
+    }
+    .detalhe-linha.ceia {
+        border-left-color: #facc15;
+        background-image: repeating-linear-gradient(45deg, rgba(250, 204, 21, .12), rgba(250, 204, 21, .12) 6px, rgba(234, 179, 8, .18) 6px, rgba(234, 179, 8, .18) 12px);
+    }
+
+    /* Celular: esconde o texto do evento e prioriza os marcadores + modal */
+    @@media (max-width: 575.98px) {
+        .cal-grid {
+            gap: 3px;
+        }
+        .cal-head {
+            font-size: .6rem;
+            letter-spacing: 0;
+        }
+        .cal-cell {
+            padding: .2rem .25rem;
+            border-radius: .35rem;
+        }
+        .cal-numero {
+            font-size: .8rem;
+        }
+        .cal-itens {
+            display: none;
+        }
+        .cal-marcador {
+            width: 7px;
+            height: 7px;
+        }
+    }
+
+    /* Telas maiores: mantém os marcadores discretos */
+    @@media (min-width: 576px) {
+        .cal-marcadores {
+            display: none;
+        }
+    }
+</style>
+
+<div class="container mt-4 mb-5">
+
+    <div class="row g-3 mb-4">
+        <!-- Bloco HOJE -->
+        <div class="col-md-7">
+            <div class="card bg-dark border-secondary h-100">
+                <div class="card-body">
+                    <div class="text-uppercase text-white-50 small fw-bold mb-1">Hoje</div>
+                    <div class="text-white fs-5 fw-semibold text-capitalize mb-3">
+                        @Model.Hoje.ToString("dddd, dd 'de' MMMM 'de' yyyy", culture)
+                    </div>
+
+                    <div class="mb-2">
+                        <span class="text-white-50 small fw-bold text-uppercase">Culto / Eventos:</span>
+                        @if (Model.TemCultoHoje)
+                        {
+                            foreach (var ev in Model.EventosHoje)
+                            {
+                                if (ev.Destaque)
                                 {
-                                    <span class="badge bg-danger">Feriado</span>
-                                }
-                                else if (item.Categoria == "Aniversário")
-                                {
-                                    <span class="badge bg-warning text-dark">Aniversário</span>
+                                    <div class="d-inline-block me-2 mb-1 px-2 py-1 rounded faixa-ceia">
+                                        <span class="small">@ev.Data.ToString("HH:mm") — @ev.Titulo</span>
+                                    </div>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-success">Igreja</span>
+                                    <div class="d-inline-block me-2 mb-1 px-2 py-1 rounded" style="background-color:@corEvento;">
+                                        <span class="text-white small fw-semibold">@ev.Data.ToString("HH:mm") — @ev.Titulo</span>
+                                    </div>
                                 }
-                            </td>
-                            <td>@item.Local</td>
-                        </tr>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-white-50">Sem culto ou evento hoje.</span>
+                        }
+                    </div>
+
+                    <div class="mb-2">
+                        <span class="text-white-50 small fw-bold text-uppercase">Próximo evento:</span>
+                        @if (Model.ProximoEvento != null)
+                        {
+                            var dias = (Model.ProximoEvento.Data.Date - Model.Hoje.Date).Days;
+                            <span class="text-white">
+                                @Model.ProximoEvento.Data.ToString("dd/MM/yyyy", culture) às @Model.ProximoEvento.Data.ToString("HH:mm")
+                                — @Model.ProximoEvento.Titulo
+                                <span class="badge bg-secondary ms-1">
+                                    @(dias == 0 ? "hoje" : dias == 1 ? "amanhã" : $"em {dias} dias")
+                                </span>
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-white-50">Nenhum evento programado nos próximos meses.</span>
+                        }
+                    </div>
+
+                    @if (Model.FeriadosHoje.Any())
+                    {
+                        <div>
+                            <span class="text-white-50 small fw-bold text-uppercase">Feriado:</span>
+                            @foreach (var f in Model.FeriadosHoje)
+                            {
+                                <div class="d-inline-block me-2 mb-1 px-2 py-1 rounded" style="background-color:@corFeriado;">
+                                    <span class="text-white small fw-semibold">@f.Titulo</span>
+                                </div>
+                            }
+                        </div>
                     }
-                }
-            </tbody>
-        </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegação de mês + agendas fixas -->
+        <div class="col-md-5">
+            <div class="card bg-dark border-secondary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <a class="btn btn-outline-secondary btn-sm" asp-action="Calendario"
+                           asp-route-mes="@mesAnterior.Month" asp-route-ano="@mesAnterior.Year">&laquo;</a>
+                        <h5 class="text-white text-capitalize mb-0">@Model.NomeMes</h5>
+                        <a class="btn btn-outline-secondary btn-sm" asp-action="Calendario"
+                           asp-route-mes="@mesSeguinte.Month" asp-route-ano="@mesSeguinte.Year">&raquo;</a>
+                    </div>
+
+                    @if (!mesCorrente)
+                    {
+                        <div class="text-center mt-2 mb-3">
+                            <a class="btn btn-outline-primary btn-sm" asp-action="Calendario">Ir para hoje</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mb-3"></div>
+                    }
+
+                    <div class="text-white-50 small text-uppercase fw-bold mb-2">Nossa agenda</div>
+                    <div class="agenda-item verde mb-1">Domingo · 09:00 · EBD (Escola Bíblica Dominical)</div>
+                    <div class="agenda-item verde mb-1">Domingo · 19:00 · Culto de Celebração</div>
+                    <div class="agenda-item verde mb-1">Quarta · 19:30 · Culto de Ensino</div>
+                    <div class="agenda-item verde mb-1">Sexta · 19:30 · Oração na Igreja</div>
+                    <div class="agenda-item amarelo mb-1">1º domingo do mês · 19:00 · Culto de Ceia do Senhor</div>
+                    @if (Model.Mes == 12)
+                    {
+                        <div class="agenda-item amarelo">31 de dezembro · 22:00 · Culto da Virada + Ceia do Senhor</div>
+                    }
+
+                    <div class="cal-legenda text-white-50 small mt-3">
+                        <span class="dot" style="background-color:@corEvento;"></span>Evento
+                        <span class="dot ms-3" style="background-color:@corFeriado;"></span>Feriado
+                        <span class="dot ms-3" style="background-color:@corCeia;"></span>Ceia do Senhor
+                        @if (Model.MostrarAniversariantes)
+                        {
+                            <span class="dot ms-3" style="background-color:@corAniversario;"></span>@:Aniversário
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="mt-3">
-        <a asp-action="Index" class="btn btn-secondary">Voltar para Eventos</a>
+    <!-- Resumo do mês exibido -->
+    <div class="cal-resumo mb-3">
+        <span class="cal-resumo-item">
+            <span class="cal-marcador" style="background-color:@corEvento;"></span>
+            <strong>@Model.TotalEventos</strong> evento(s)
+        </span>
+        <span class="cal-resumo-item">
+            <span class="cal-marcador" style="background-color:@corCeia;"></span>
+            <strong>@Model.TotalCultos</strong> culto(s)
+        </span>
+        <span class="cal-resumo-item">
+            <span class="cal-marcador" style="background-color:@corFeriado;"></span>
+            <strong>@Model.TotalFeriados</strong> feriado(s)
+        </span>
+        @if (Model.MostrarAniversariantes)
+        {
+            <span class="cal-resumo-item">
+                <span class="cal-marcador" style="background-color:@corAniversario;"></span>
+                <strong>@Model.TotalAniversariantes</strong> aniversariante(s)
+            </span>
+        }
+    </div>
+
+    <!-- Grade do calendário (somente o mês exibido) -->
+    <div class="card bg-dark border-secondary">
+        <div class="card-body p-2 p-md-3">
+            <div class="cal-grid">
+                @foreach (var dia in diasSemana)
+                {
+                    <div class="cal-head">@dia</div>
+                }
+
+                @for (int v = 0; v < vaziosIniciais; v++)
+                {
+                    <div class="cal-cell vazio"></div>
+                }
+
+                @foreach (var d in Model.Dias)
+                {
+                    var classes = "cal-cell";
+                    if (d.EhHoje) { classes += " hoje"; }
+                    if (d.Itens.Any()) { classes += " tem-itens"; }
+
+                    var diaLongo = d.Data.ToString("dddd, dd 'de' MMMM 'de' yyyy", culture);
+
+                    <div class="@classes" role="button" tabindex="0"
+                         data-bs-toggle="modal" data-bs-target="#modalDia"
+                         data-dia="@d.Data.ToString("dd/MM/yyyy")"
+                         data-dia-longo="@diaLongo">
+                        <div class="cal-numero">@d.Data.Day</div>
+                        <div class="cal-dia-semana">@d.DiaSemana</div>
+
+                        @* Marcadores coloridos: aparecem em qualquer tela, mesmo no celular *@
+                        <div class="cal-marcadores">
+                            @foreach (var item in d.Itens.Take(5))
+                            {
+                                var corMarcador = item.Destaque ? corCeia
+                                        : item.Categoria == "Feriado" ? corFeriado
+                                        : item.Categoria == "Aniversário" ? corAniversario
+                                        : corEvento;
+                                <span class="cal-marcador" style="background-color:@corMarcador;"></span>
+                            }
+                            @if (d.Itens.Count > 5)
+                            {
+                                <span class="cal-marcador mais">+@(d.Itens.Count - 5)</span>
+                            }
+                        </div>
+
+                        @* Texto do evento: visível apenas em telas maiores *@
+                        <div class="cal-itens">
+                            @foreach (var item in d.Itens.Take(3))
+                            {
+                                var texto = item.Rotulo;
+
+                                if (item.Destaque)
+                                {
+                                    <div class="cal-item ceia" title="@texto">@texto</div>
+                                }
+                                else
+                                {
+                                    var cor = item.Categoria == "Feriado" ? corFeriado
+                                            : item.Categoria == "Aniversário" ? corAniversario
+                                            : corEvento;
+                                    <div class="cal-item" style="background-color:@cor;" title="@texto">@texto</div>
+                                }
+                            }
+                            @if (d.Itens.Count > 3)
+                            {
+                                <div class="cal-mais">+@(d.Itens.Count - 3) mais</div>
+                            }
+                        </div>
+
+                        @* Conteúdo completo consumido pelo modal (zoom do dia) *@
+                        <div class="cal-detalhe">
+                            @if (!d.Itens.Any())
+                            {
+                                <p class="text-white-50 mb-0">Nenhum evento, feriado ou aniversário neste dia.</p>
+                            }
+                            else
+                            {
+                                foreach (var item in d.Itens)
+                                {
+                                    <div class="detalhe-linha @(item.Destaque ? "ceia" : "")"
+                                         style="@(item.Destaque ? "" : $"border-left-color:{(item.Categoria == "Feriado" ? corFeriado : item.Categoria == "Aniversário" ? corAniversario : corEvento)};")">
+                                        <div class="fw-semibold text-white">
+                                            @if (item.Categoria == "Evento")
+                                            {
+                                                <span class="text-white-50 me-1">@item.Data.ToString("HH:mm")</span>
+                                            }
+                                            @item.Rotulo
+                                        </div>
+                                        <div class="small text-white-50">
+                                            @item.Categoria
+                                            @if (!string.IsNullOrWhiteSpace(item.Local) && item.Local != "-")
+                                            {
+                                                @: · @item.Local
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal: zoom do dia -->
+<div class="modal fade" id="modalDia" tabindex="-1" aria-labelledby="modalDiaTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content bg-dark border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-white text-capitalize" id="modalDiaTitulo">Dia</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body text-white" id="modalDiaCorpo">
+            </div>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var modalDia = document.getElementById('modalDia');
+            if (!modalDia) { return; }
+
+            modalDia.addEventListener('show.bs.modal', function (event) {
+                var celula = event.relatedTarget;
+                if (!celula) { return; }
+
+                var titulo = modalDia.querySelector('#modalDiaTitulo');
+                var corpo = modalDia.querySelector('#modalDiaCorpo');
+                var diaLongo = celula.getAttribute('data-dia-longo') || celula.getAttribute('data-dia');
+
+                titulo.textContent = diaLongo;
+                corpo.innerHTML = '';
+
+                var detalhe = celula.querySelector('.cal-detalhe');
+                if (detalhe) {
+                    corpo.innerHTML = detalhe.innerHTML;
+                }
+            });
+
+            // Acessibilidade: abrir com Enter/Espaço pelo teclado
+            document.querySelectorAll('.cal-cell[data-bs-toggle]').forEach(function (celula) {
+                celula.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        celula.click();
+                    }
+                });
+            });
+        })();
+    </script>
+}

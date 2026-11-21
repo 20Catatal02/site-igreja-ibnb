@@ -11,3 +11,5 @@
 ## Ignorar arquivos de log e ambiente
 *.log
 .env
+# Backups locais
+*.bak

@@ -24,6 +24,9 @@ namespace IBNB.Models
         public int? IndiceSemana { get; set; } 
         public DayOfWeek? DiaDaSemana { get; set; } 
 
+        // Propriedade de Navegação (Boas práticas do EF Core)
+        public virtual ICollection<Imagem> Imagens { get; set; } = new List<Imagem>();
+
         // --- Propriedades do Soft Delete ---
         public bool IsAtivo { get; set; } = true;
         public DateTime? DeletedAt { get; set; }
