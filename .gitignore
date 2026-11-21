@@ -13,3 +13,7 @@
 .env
 # Backups locais
 *.bak
+
+## Build output (nunca versionar)
+bin/
+obj/
