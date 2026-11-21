@@ -38,7 +38,8 @@
         position: relative;
         padding-bottom: 2rem;
     }
-    /* Linha vertical central, apenas no desktop */
+    /* Linha vertical central (desktop): gradiente continuo amarelo -> verde -> vermelho,
+       com as pontas dissolvidas para nao criar corte visual. */
     .ev-trilha::before {
         content: "";
         position: absolute;
@@ -48,10 +49,20 @@
         width: 2px;
         transform: translateX(-50%);
         background: linear-gradient(to bottom,
-            rgba(25, 135, 84, 0) 0%,
-            rgba(25, 135, 84, .55) 8%,
-            rgba(25, 135, 84, .55) 92%,
-            rgba(25, 135, 84, 0) 100%);
+            rgba(250, 204, 21, 0) 0%,
+            rgba(250, 204, 21, .30) 6%,
+            rgba(250, 204, 21, .55) 22%,
+            rgba(25, 135, 84, .55) 50%,
+            rgba(220, 53, 69, .55) 78%,
+            rgba(220, 53, 69, .30) 94%,
+            rgba(220, 53, 69, 0) 100%);
+        background-size: 100% 100%;
+        opacity: .35;
+        transition: opacity 2.2s cubic-bezier(.16, .84, .44, 1);
+    }
+    /* Ao passar o mouse na trilha, o gradiente se revela lentamente */
+    .ev-trilha:hover::before {
+        opacity: .75;
     }
 
     .ev-bloco {
@@ -220,8 +231,8 @@
     /* Cor de destaque de cada bloco (verde normal, amarelo para Ceia/Virada) */
     .ev-bloco {
         --ev-cor: #198754;
-        --ev-tempo: 1.15s;
-        --ev-curva: cubic-bezier(.25, .1, .25, 1);
+        --ev-tempo: 1.9s;
+        --ev-curva: cubic-bezier(.16, .84, .44, 1);
     }
     .ev-bloco.destaque {
         --ev-cor: #facc15;
@@ -246,18 +257,19 @@
             bottom: 0;
             left: 50%;
             width: 2px;
-            transform: translateX(-50%) scaleY(.45);
+            transform: translateX(-50%) scaleY(.3);
             transform-origin: center;
             background-color: var(--ev-cor);
             opacity: 0;
             transition:
                 opacity var(--ev-tempo) var(--ev-curva),
-                transform var(--ev-tempo) var(--ev-curva);
+                transform var(--ev-tempo) var(--ev-curva),
+                background-color var(--ev-tempo) var(--ev-curva);
             pointer-events: none;
         }
         .ev-bloco:hover::after {
             content: "";
-            opacity: .42;
+            opacity: .38;
             transform: translateX(-50%) scaleY(1);
         }
     }
@@ -372,6 +384,11 @@
 
     /* ===== Mobile: zoom e foco por toque (persistente) ===== */
     @@media (max-width: 767.98px) {
+        /* Mais area livre entre os cards: espaco para tocar fora e limpar o foco */
+        .ev-bloco {
+            margin-bottom: 3.9rem;
+        }
+
         .ev-card {
             transition:
                 transform .35s cubic-bezier(.22, .61, .36, 1),
