@@ -247,6 +247,18 @@
         .cal-marcadores {
             display: none;
         }
+
+        /* Desktop: encolhe a faixa de resumo ao conteúdo e centraliza o bloco,
+           eliminando o espaço vago à esquerda e à direita.
+           (No mobile a faixa continua ocupando a largura toda.) */
+        .cal-resumo {
+            width: fit-content;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            gap: .35rem 1.15rem;
+            padding: .45rem 1.1rem;
+        }
     }
 </style>
 
