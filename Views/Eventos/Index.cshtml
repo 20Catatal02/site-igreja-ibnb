@@ -57,7 +57,7 @@
     /* Linha do "scrollytelling" */
     .ev-trilha {
         position: relative;
-        padding-bottom: 2rem;
+        padding-bottom: 0;
     }
     /* Linha vertical central (desktop).
        A cor segue a mesma logica do calendario:
@@ -425,13 +425,23 @@
         /* Enquanto houver um card selecionado, os demais ficam opacos e
            desfocados. O estado permanece ate o usuario tocar fora do card. */
         .ev-trilha.ev-tem-selecao .ev-bloco {
-            opacity: .45;
-            filter: blur(1.5px);
-            transition: opacity .35s ease, filter .35s ease;
+            filter: blur(1.5px) brightness(.55) saturate(.8);
+            transition: filter .35s ease;
         }
         .ev-trilha.ev-tem-selecao .ev-bloco.ev-selecionado {
-            opacity: 1;
             filter: none;
+        }
+
+        /* No toque, o card so ganha borda quando for selecionado de fato.
+           Evita o realce de hover durante o toque longo. */
+        .ev-bloco:not(.ev-selecionado):hover .ev-card,
+        .ev-bloco:not(.ev-selecionado) .ev-card:hover {
+            border-color: #3a3f45;
+            transform: none;
+            box-shadow: none;
+        }
+        .ev-bloco:not(.ev-selecionado):hover .ev-card.destaque {
+            border-color: #a16207;
         }
 
         /* Nao selecionar texto ao tocar no card */
@@ -439,6 +449,22 @@
             -webkit-user-select: none;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+        }
+    }
+
+    @@media (hover: hover) and (min-width: 768px) {
+        .ev-bloco {
+            transition: filter .35s ease;
+        }
+
+        /* Desktop: o card sob o mouse acende e os demais escurecem,
+           sem usar opacity, para a linha central nao atravessar os cards. */
+        .ev-trilha:has(.ev-bloco:hover) .ev-bloco {
+            filter: blur(1.5px) brightness(.55) saturate(.8);
+        }
+
+        .ev-trilha:has(.ev-bloco:hover) .ev-bloco:hover {
+            filter: none;
         }
     }
 
@@ -461,8 +487,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: .9rem;
-        padding: 2.2rem 0 1rem;
+        gap: 1.35rem;
+        padding: 3.2rem 0 0;
     }
     .ev-fim-ponto {
         width: 14px;
@@ -624,6 +650,9 @@
         (function () {
             var trilha = document.querySelector('.ev-trilha');
             if (!trilha) { return; }
+
+            // No desktop a leitura e por hover; o clique nao seleciona.
+            if (window.matchMedia('(hover: hover) and (min-width: 768px)').matches) { return; }
 
             var blocoSelecionado = null;
 
