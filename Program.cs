@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using IBNB.Data; 
+using IBNB.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Globalization;
@@ -37,6 +38,13 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => {
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(); // Necessário para as telas de Login/Registro do Identity
 
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton(TimeProvider.System);
+
+builder.Services.AddScoped<VersiculoDoDiaService>();
+builder.Services.AddScoped<VersiculosSeeder>();
+
+// Somente o serviço de feriados usa rede (BrasilAPI, opt-in).
 builder.Services.AddHttpClient<IBNB.Services.FeriadoService>();
 
 var app = builder.Build();
@@ -47,19 +55,34 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles(); // Ou app.MapStaticAssets() se for .NET 9+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); // Diz "quem é o usuário" (lê o cookie)
-app.UseAuthorization();  // Diz "o que ele pode acessar" ([Authorize])
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.MapRazorPages(); // Mapeia as telas do Identity (/Identity/Account/Login)
+app.MapRazorPages();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        await scope.ServiceProvider.GetRequiredService<VersiculosSeeder>().SeedAsync();
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "Falha ao carregar o seed de versículos.");
+    }
+}
 
 app.Run();

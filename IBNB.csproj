@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -28,6 +28,10 @@
     <PackageReference Include="NuGet.Packaging" Version="6.14.3" PrivateAssets="all" />
     <PackageReference Include="NuGet.Protocol" Version="6.14.3" PrivateAssets="all" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.15" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Data\versiculos_seed.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

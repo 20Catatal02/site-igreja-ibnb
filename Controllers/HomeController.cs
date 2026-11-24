@@ -1,30 +1,36 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using IBNB.Data;
 using IBNB.Models;
+using IBNB.Services;
+using IBNB.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace IBNB.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly AppDbContext _context;
+    private readonly VersiculoDoDiaService _versiculoDoDia;
 
-    public HomeController(AppDbContext context)
+    public HomeController(VersiculoDoDiaService versiculoDoDia)
     {
-        _context = context;
+        _versiculoDoDia = versiculoDoDia;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        // Busca os próximos 3 eventos a partir de hoje
-        var proximosEventos = await _context.Eventos
-            .Where(e => e.DataHora >= DateTime.Today)
-            .OrderBy(e => e.DataHora)
-            .Take(3)
-            .ToListAsync();
+        var versiculo = await _versiculoDoDia.ObterAsync(cancellationToken);
 
-        return View(proximosEventos);
+        var modelo = new HomeViewModel
+        {
+            Versiculo = versiculo is null ? null : new VersiculoDoDiaViewModel
+            {
+                Texto = versiculo.Texto,
+                Referencia = versiculo.Referencia,
+                Autor = versiculo.Autor,
+                Traducao = versiculo.Traducao
+            }
+        };
+
+        return View(modelo);
     }
 
     public IActionResult Privacy()

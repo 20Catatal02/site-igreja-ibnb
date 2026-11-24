@@ -1,10 +1,11 @@
-/* Força o fundo escuro global */
+/* Forca o fundo escuro global */
 body {
     background-color: #1a1a1a !important;
     color: #e0e0e0 !important;
+    margin-bottom: 0 !important;
 }
 
-/* Ajusta a navbar para não ficar branca */
+/* Ajusta a navbar para nao ficar branca */
 .navbar {
     background-color: #212529 !important;
 }
@@ -19,46 +20,604 @@ html {
     min-height: 100%;
 }
 
-body {
-    margin-bottom: 0 !important; /* Remove a margem padrão que causava o buraco no final */
+.footer {
+    position: static !important;
+    white-space: normal !important;
+    color: #a7b1bb !important;
+    background: linear-gradient(155deg, #171b20 0%, #101317 100%);
+    border-top: 1px solid #2a3037 !important;
+    padding: 0.85rem 0;
 }
 
-.footer {
-    position: static !important; /* Remove a fixação absoluta */
-    white-space: normal !important; 
+.footer-conteudo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem 0.45rem;
+    font-size: 0.86rem;
+    line-height: 1.4;
 }
 
-.footer {
-    color: #888 !important; /* Cor cinza clara para garantir leitura no fundo escuro */
+.footer-separador {
+    color: #6b7580;
 }
+
 .footer a {
-    color: #4da3ff !important; /* Azul claro para o link */
+    color: #4da3ff !important;
 }
 
-/* Remove as bolinhas de qualquer lista de navegação */
+/* Remove as bolinhas de qualquer lista de navegacao */
 .navbar-nav {
     list-style-type: none !important;
     padding-left: 0 !important;
 }
 
-/* Força o fundo escuro na tela de login e páginas do Identity */
-body {
-    background-color: #1a1a1a !important;
-    color: #e0e0e0 !important;
-}
-
-/* Ajusta os inputs da tela de login para não ficarem com fundo branco estourado */
+/* Ajusta os inputs da tela de login para nao ficarem com fundo branco estourado */
 .form-control {
     background-color: #2b2b2b !important;
     color: #fff !important;
     border: 1px solid #444 !important;
 }
 
-/* Efeito de elevação para os cards da Home */
+/* Efeito de elevacao para os cards da Home */
 .hover-effect {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 .hover-effect:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Marca IBNB: negrito, caixa alta e tamanho levemente maior */
+.navbar .navbar-brand {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700 !important;
+    text-transform: none !important;
+    font-size: 1.45rem !important;
+    letter-spacing: 0;
+    line-height: 1;
+}
+
+.navbar-marca {
+    height: 30px;
+    width: auto;
+}
+
+/* Entrar/Sair: texto alinhado por padrao; o contorno aparece ao interagir */
+.navbar .nav-entrar,
+.navbar .nav-item form .nav-sair {
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    margin-left: 0;
+    line-height: 1.3;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar .nav-entrar:hover,
+.navbar .nav-item form .nav-sair:hover,
+.navbar .nav-entrar:focus-visible,
+.navbar .nav-item form .nav-sair:focus-visible {
+    border-color: #3a4148;
+    background-color: rgba(255, 255, 255, 0.04);
+    color: #fff !important;
+}
+
+@media (hover: none) {
+    .navbar .nav-entrar:active,
+    .navbar .nav-item form .nav-sair:active {
+        border-color: #3a4148;
+        background-color: rgba(255, 255, 255, 0.04);
+    }
+}
+
+/* Mobile: sub-botoes do menu na horizontal e centralizados */
+@media (max-width: 575.98px) {
+    .navbar .navbar-collapse {
+        width: 100% !important;
+        flex-basis: 100% !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .navbar-nav {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.25rem !important;
+        width: 100% !important;
+        flex-grow: 0 !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        padding-bottom: 0.25rem !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-bottom: 0 !important;
+    }
+
+    .navbar-nav .nav-item {
+        width: auto !important;
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+    }
+
+    .navbar-nav .nav-item form {
+        display: flex !important;
+        align-items: center !important;
+        width: auto !important;
+        margin: 0 !important;
+    }
+
+    .navbar-nav .nav-link,
+    .navbar-nav .nav-item form .nav-link.btn {
+        display: inline-block !important;
+        width: auto !important;
+        text-align: center !important;
+        padding: 0.375rem 0.75rem !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+        line-height: 1.5 !important;
+        border-radius: 0.375rem;
+    }
+
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-item form .nav-link.btn:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+}
+
+/* Fotos da lideranca: recorte centralizado e leve destaque */
+.lideranca-foto {
+    aspect-ratio: 1 / 1;
+    background-color: #2b2b2b;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+/* Home: estrutura e hero */
+.home-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(520px, 62vh, 700px);
+    padding: 4.5rem 1.5rem 4rem;
+    margin-bottom: 4.5rem;
+    text-align: center;
+    border: 1px solid #2a3037;
+    border-radius: 24px;
+    overflow: hidden;
+    background:
+        radial-gradient(900px 380px at 85% -10%, rgba(77, 159, 255, 0.22), transparent 60%),
+        radial-gradient(700px 320px at 0% 110%, rgba(240, 180, 41, 0.10), transparent 60%),
+        linear-gradient(155deg, #171b20 0%, #101317 100%);
+}
+
+.home-hero-conteudo {
+    max-width: 720px;
+}
+
+.home-hero-marca {
+    display: block;
+    height: 54px;
+    width: auto;
+    margin: 0 auto 1.25rem;
+}
+
+.home-rotulo {
+    margin-bottom: 0.75rem;
+    color: #7fb2ff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.home-hero-titulo {
+    margin-bottom: 1rem;
+    color: #fff;
+    font-size: clamp(2.1rem, 5vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+}
+
+.home-hero-texto {
+    max-width: 560px;
+    margin: 0 auto 2rem;
+    color: #b7c0c9;
+    font-size: 1.08rem;
+    line-height: 1.6;
+}
+
+.home-hero-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.home-hero-rolagem {
+    position: absolute;
+    bottom: 1.1rem;
+    left: 50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transform: translateX(-50%);
+    color: #a7b1bb;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+}
+
+.home-hero-rolagem:hover {
+    color: #d7dde3;
+}
+
+.home-hero-rolagem svg {
+    animation: home-seta 2s ease-in-out infinite;
+}
+
+@keyframes home-seta {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+}
+
+/* Faixa do versículo do dia */
+.home-verso-faixa {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin: -2.5rem 0 4.5rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid #2a3037;
+    border-radius: 16px;
+    background-color: #171b20;
+}
+
+.home-verso-rotulo {
+    flex: 0 0 auto;
+    margin: 0;
+    color: #7fb2ff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.home-verso-conteudo {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.home-verso-resumo {
+    margin: 0;
+    color: #d7dde3;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.home-verso-meta {
+    margin: 0.25rem 0 0;
+    color: #8b959f;
+    font-size: 0.78rem;
+    line-height: 1.3;
+}
+
+.home-verso-meta .home-verso-autor {
+    font-size: 0.74rem;
+}
+
+.home-verso-botao {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.home-verso-botao[hidden] {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    .home-verso-faixa {
+        flex-wrap: wrap;
+        gap: 0.6rem 1rem;
+        margin: -1.25rem 0 3rem;
+    }
+
+    .home-verso-conteudo {
+        flex-basis: 100%;
+        order: 3;
+    }
+
+    .home-verso-botao {
+        margin-left: auto;
+    }
+}
+
+/* Modal do versículo */
+.home-verso-texto {
+    margin: 0 0 1.25rem;
+    color: #e8eaed;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+    line-height: 1.6;
+}
+
+.home-verso-referencia {
+    margin: 0;
+    color: #b7c0c9;
+    font-size: 0.92rem;
+}
+
+.home-verso-autor {
+    color: #7f8a95;
+    font-size: 0.84rem;
+}
+
+.home-verso-traducao {
+    color: #6f7883;
+    font-size: 0.78rem;
+}
+
+/* Véu dos modais */
+.modal-backdrop.show {
+    opacity: 1;
+    background-color: rgba(8, 10, 12, .66);
+    backdrop-filter: blur(7px) saturate(.85);
+    -webkit-backdrop-filter: blur(7px) saturate(.85);
+}
+
+/* Seções da home */
+.home-secao {
+    margin-bottom: 4.5rem;
+    scroll-margin-top: 96px;
+}
+
+.home-secao-cabecalho {
+    max-width: 620px;
+    margin-bottom: 1.75rem;
+}
+
+.home-titulo {
+    margin-bottom: 0.9rem;
+    color: #fff;
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+}
+
+.home-texto {
+    color: #b7c0c9;
+    line-height: 1.7;
+}
+
+.home-foto {
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid #2a3037;
+    border-radius: 20px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.home-foto img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+
+.home-lideranca {
+    margin-top: 1.25rem;
+    padding-left: 1rem;
+    border-left: 3px solid #4d9fff;
+    color: #9aa4ae;
+    font-size: 0.92rem;
+}
+
+.home-lideranca strong {
+    color: #e8eaed;
+    font-weight: 600;
+}
+
+/* Nossa semana */
+.home-semana-card {
+    overflow: hidden;
+    border: 1px solid #2a3037;
+    border-radius: 20px;
+    background-color: #1b1f24;
+}
+
+.home-semana-linha {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid #2a3037;
+    transition: background-color 0.2s ease;
+}
+
+.home-semana-linha:last-child {
+    border-bottom: 0;
+}
+
+.home-semana-linha:hover {
+    background-color: #20252b;
+}
+
+.home-semana-linha.hoje {
+    background: rgba(212, 175, 55, .05);
+    box-shadow: inset 3px 0 0 #d4af37;
+}
+
+.home-semana-dia {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: .45rem;
+}
+
+.home-semana-dia-nome {
+    color: #7fb2ff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.home-semana-hoje {
+    display: inline-block;
+    padding: .05rem .4rem;
+    border-radius: 999px;
+    background-color: rgba(212, 175, 55, .16);
+    color: #e8c96a;
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.home-semana-conteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.home-semana-item {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 1rem;
+    align-items: baseline;
+}
+
+.home-semana-hora {
+    color: #7fb2ff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+}
+
+.home-semana-nome {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.home-semana-desc {
+    margin-top: .1rem;
+    color: #8b959f;
+    font-size: .85rem;
+    line-height: 1.45;
+}
+
+@media (hover: none) {
+    .home-semana-linha:active {
+        background-color: #20252b;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .home-semana-linha {
+        grid-template-columns: 1fr;
+        gap: .75rem;
+        padding: 1.25rem;
+    }
+
+    .home-semana-item {
+        grid-template-columns: 54px 1fr;
+        gap: .75rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-semana-linha {
+        transition: none;
+    }
+}
+
+/* Convite */
+.home-convite {
+    margin-bottom: 1.5rem;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    border: 1px solid #2a3037;
+    border-radius: 24px;
+    background:
+        radial-gradient(600px 260px at 50% 0%, rgba(77, 159, 255, 0.14), transparent 65%),
+        #14181c;
+}
+
+.home-convite .home-texto {
+    max-width: 520px;
+    margin: 0 auto 1.5rem;
+}
+
+.home-endereco {
+    max-width: 520px;
+    margin: 0 auto 1.25rem;
+    color: #b7c0c9;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.home-convite-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    justify-content: center;
+}
+
+@media (max-width: 575.98px) {
+    .home-convite-acoes {
+        flex-direction: column;
+    }
+
+    .home-convite-acoes .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .home-hero {
+        min-height: 58vh;
+        padding: 3rem 1rem 3.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .home-hero-acoes {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .home-hero-acoes .btn {
+        width: 100%;
+    }
+
+    .home-secao {
+        margin-bottom: 3rem;
+    }
+
+    .home-hero-titulo {
+        font-size: 2rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-hero-rolagem svg {
+        animation: none;
+    }
 }
