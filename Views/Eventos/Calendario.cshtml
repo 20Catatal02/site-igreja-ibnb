@@ -57,6 +57,23 @@
         border: 2px solid #0d6efd;
         background-color: #1b2a3d;
     }
+    /* Dia aberto no modal: fica acima do véu com menos desfoque e leve escurecimento */
+    .cal-cell.selecionado {
+        position: relative;
+        z-index: 1051;
+        border-color: rgba(77, 159, 255, .65);
+        background-color: #1b2a3d;
+        filter: blur(1.1px) brightness(.92);
+        transition: border-color .2s ease, background-color .2s ease;
+    }
+    .cal-cell.selecionado::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background-color: rgba(10, 12, 14, .28);
+        pointer-events: none;
+    }
     .cal-numero {
         font-weight: 700;
         font-size: .95rem;
@@ -202,6 +219,14 @@
     }
     .cal-cell.hoje .cal-dia-semana {
         color: #4da3ff;
+    }
+
+    /* Fundo do modal: escurece e desfoca o calendário */
+    .modal-backdrop.show {
+        opacity: 1;
+        background-color: rgba(8, 10, 12, .66);
+        backdrop-filter: blur(7px) saturate(.85);
+        -webkit-backdrop-filter: blur(7px) saturate(.85);
     }
 
     /* Itens do modal (zoom do dia) */
@@ -537,6 +562,11 @@
                 var celula = event.relatedTarget;
                 if (!celula) { return; }
 
+                document.querySelectorAll('.cal-cell.selecionado').forEach(function (item) {
+                    item.classList.remove('selecionado');
+                });
+                celula.classList.add('selecionado');
+
                 var titulo = modalDia.querySelector('#modalDiaTitulo');
                 var corpo = modalDia.querySelector('#modalDiaCorpo');
                 var diaLongo = celula.getAttribute('data-dia-longo') || celula.getAttribute('data-dia');
@@ -548,6 +578,12 @@
                 if (detalhe) {
                     corpo.innerHTML = detalhe.innerHTML;
                 }
+            });
+
+            modalDia.addEventListener('hidden.bs.modal', function () {
+                document.querySelectorAll('.cal-cell.selecionado').forEach(function (item) {
+                    item.classList.remove('selecionado');
+                });
             });
 
             // Acessibilidade: abrir com Enter/Espaço pelo teclado
