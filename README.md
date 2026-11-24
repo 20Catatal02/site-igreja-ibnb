@@ -1,50 +1,69 @@
-# Sistema de Gestão IBNB
+# IBNB - Igreja Batista Nacional Betsaida
 
-Um sistema web completo de gestão e agenda unificada desenvolvido para a comunidade da IBNB. O projeto centraliza a visualização de cultos, eventos, feriados nacionais e aniversariantes, além de contar com uma área administrativa protegida.
+Site público e agenda da Igreja Batista Nacional Betsaida (IBNB), em Ipatinga/MG.
 
-## Funcionalidades
+O projeto está na fase de vitrine pública concluída: home, calendário mensal e página de próximos eventos. O backend de gestão de eventos, departamentos e permissões ainda está em construção.
 
-### Área Pública (Leitura)
-- **Calendário Unificado:** Exibição de feriados integrados via Brasil API, eventos da igreja e aniversariantes do mês.
-- **Lista de Aniversariantes:** Visualização pública das datas de nascimento da comunidade.
-- **Design Responsivo e Dark Mode:** Interface adaptada para telemóveis e computadores, com tema escuro nativo.
+## Documentação
 
-### Área Restrita (Administração)
-- **Autenticação Segura:** Sistema de login e registo utilizando ASP.NET Core Identity.
-- **CRUD de Aniversariantes:** Gestão completa (Criar, Ler, Atualizar, Excluir) com uso de modais e AJAX para melhor experiência do utilizador.
-- **Soft Delete:** Exclusões de registos não apagam os dados do banco, apenas os inativam, preservando o histórico.
-- **Gestão de Eventos (Em desenvolvimento):** Criação de eventos com suporte a recorrências flexíveis.
+- [Guia do projeto](docs/PROJETO.md): arquitetura, instalação, banco, operação e dívidas técnicas.
+- [Regras de negócio](docs/REGRAS-DE-NEGOCIO.md): regras atuais, permissões e roadmap do backend.
 
-## Tecnologias Utilizadas
+Leia os dois antes de alterar o domínio ou as permissões.
 
-- **Framework:** .NET 10 / ASP.NET Core MVC
-- **Banco de Dados:** PostgreSQL
-- **ORM:** Entity Framework Core
-- **Front-end:** Bootstrap 5, JavaScript (Fetch API)
-- **Autenticação:** ASP.NET Core Identity
-- **Integrações:** Brasil API (Feriados)
+## Stack
 
-## Como Executar o Projeto Localmente
+- .NET 10 / ASP.NET Core MVC
+- Entity Framework Core 10 + Npgsql
+- PostgreSQL
+- ASP.NET Core Identity
+- Bootstrap 5, Razor e JavaScript
+- Bíblia Livre (BLIVRE) para o versículo do dia
 
-### Pré-requisitos
-- .NET 10 SDK instalado
-- PostgreSQL instalado e rodando
+## Rodando localmente
 
-### Passo a passo
+Pré-requisitos: .NET 10 SDK, PostgreSQL e a ferramenta `dotnet-ef`.
 
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/20Catatal02/site-igreja-ibnb.git
+1. Configure a conexão sem commitar senha:
 
-2. Configure a string de conexão do banco de dados no arquivo appsettings.json:
-"ConnectionStrings": {
-  "DefaultConnection": "Host=localhost;Database=ibnb_db;Username=seu_usuario;Password=sua_senha"
-}
+```powershell
+$env:ConnectionStrings__DefaultConnection="Host=localhost;Database=ibnb_db;Username=postgres;Password=SUA_SENHA"
+```
 
-3. Aplique as migrações para criar o banco de dados:
+2. Aplique as migrations:
+
+```powershell
 dotnet ef database update
+```
 
-4. Execute o Projeto:
-dotnet run
+3. Rode o projeto:
 
-5. Acesse no navegador com a porta local configurada
+```powershell
+$env:ASPNETCORE_ENVIRONMENT="Development"
+$env:ASPNETCORE_URLS="http://0.0.0.0:5084"
+dotnet watch run --no-launch-profile --non-interactive
+```
+
+4. Acesse `http://localhost:5084` ou, no celular da mesma rede, `http://IP_DA_MAQUINA:5084`.
+
+Na primeira execução, o seed de 365 versículos é carregado a partir de `Data/versiculos_seed.json`. O banco não é criado automaticamente; rode as migrations antes.
+
+## Estrutura rápida
+
+- `Controllers/`: Home, Eventos e Aniversariantes.
+- `Models/`: entidades e serviços de domínio.
+- `ViewModels/`: modelos de tela.
+- `Views/`: Razor.
+- `Data/`: `AppDbContext`, seed de versículos e migrations.
+- `wwwroot/`: CSS, JavaScript e imagens.
+- `docs/`: documentação para manutenção.
+
+## Estado atual
+
+Funciona: home, versículo do dia, calendário mensal, feriados, próximos eventos, aniversariantes autenticados e login/registro.
+
+Pendente: edição/exclusão de eventos, departamentos como entidade, roles efetivas, cadastro de horários fixos, upload de imagens, testes automatizados e implantação.
+
+## Créditos
+
+Texto bíblico: Bíblia Livre (BLIVRE), com crédito no rodapé do site.
