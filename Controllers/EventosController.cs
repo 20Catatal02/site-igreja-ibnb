@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IBNB.Data;
 using IBNB.Models;
@@ -298,6 +298,7 @@ namespace IBNB.Controllers
                         Data = data,
                         Categoria = "Evento",
                         Local = ev.Local,
+                        Departamento = ev.Departamento,
                         Subtipo = tipo,
                         Destaque = ehCeia
                     });
@@ -366,6 +367,7 @@ namespace IBNB.Controllers
                         Data = data,
                         Categoria = "Evento",
                         Local = ev.Local,
+                        Departamento = ev.Departamento,
                         Subtipo = TipoOcorrencia(ev, data),
                         Destaque = TipoOcorrencia(ev, data) is "Ceia" or "Virada"
                     }))

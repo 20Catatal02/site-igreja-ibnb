@@ -1,4 +1,4 @@
-﻿namespace IBNB.ViewModels
+namespace IBNB.ViewModels
 {
     public class CalendarioItemViewModel
     {
@@ -6,6 +6,20 @@
         public DateTime Data { get; set; }
         public string Categoria { get; set; } = string.Empty; // "Evento", "Feriado", "Aniversário"
         public string Local { get; set; } = string.Empty;
+
+        // Departamento responsável pela programação (opcional)
+        public string? Departamento { get; set; }
+
+        // Cor do evento: departamentos têm cores próprias; os demais usam o verde.
+        public string Cor => string.IsNullOrWhiteSpace(Departamento)
+            ? "#198754"
+            : Departamento.Trim().ToLowerInvariant() switch
+            {
+                "homens" => "#1e3a8a",
+                "mulheres" => "#ec4899",
+                "jovens" => "#8b5cf6",
+                _ => "#198754"
+            };
 
         // Classificação do evento: "Ceia", "EBD", "CultoNoturno" ou "Evento"
         public string Subtipo { get; set; } = "Evento";

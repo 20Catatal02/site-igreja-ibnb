@@ -10,6 +10,9 @@ namespace IBNB.Models
         public DateTime DataHora { get; set; }
         public string Local { get; set; } = string.Empty;
 
+        // Departamento/ministério responsável pela programação (opcional)
+        public string? Departamento { get; set; }
+
         // Recorrência Flexível
         public bool IsRecorrente { get; set; }
         

@@ -17,7 +17,7 @@ namespace IBNB.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -31,10 +31,10 @@ namespace IBNB.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DataNascimento")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("DeletedPor")
                         .HasColumnType("text");
@@ -60,13 +60,17 @@ namespace IBNB.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DataHora")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("DeletedPor")
                         .HasColumnType("text");
+
+                    b.Property<string>("Departamento")
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
 
                     b.Property<string>("Descricao")
                         .IsRequired()
@@ -104,6 +108,89 @@ namespace IBNB.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Eventos");
+                });
+
+            modelBuilder.Entity("IBNB.Models.Imagem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Caminho")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("DataUpload")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("EventoId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("NomeOriginal")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventoId");
+
+                    b.ToTable("Imagem");
+                });
+
+            modelBuilder.Entity("IBNB.Models.Versiculo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Autor")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<string>("Referencia")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Traducao")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<DateOnly?>("UltimaExibicao")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Referencia", "Traducao")
+                        .IsUnique();
+
+                    b.ToTable("Versiculos");
+                });
+
+            modelBuilder.Entity("IBNB.Models.VersiculoDoDia", b =>
+                {
+                    b.Property<DateOnly>("Data")
+                        .HasColumnType("date");
+
+                    b.Property<int>("VersiculoId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Data");
+
+                    b.HasIndex("VersiculoId");
+
+                    b.ToTable("VersiculosDoDia");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -249,10 +336,12 @@ namespace IBNB.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
@@ -289,10 +378,12 @@ namespace IBNB.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("Value")
                         .HasColumnType("text");
@@ -300,6 +391,28 @@ namespace IBNB.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("IBNB.Models.Imagem", b =>
+                {
+                    b.HasOne("IBNB.Models.Evento", "Evento")
+                        .WithMany("Imagens")
+                        .HasForeignKey("EventoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Evento");
+                });
+
+            modelBuilder.Entity("IBNB.Models.VersiculoDoDia", b =>
+                {
+                    b.HasOne("IBNB.Models.Versiculo", "Versiculo")
+                        .WithMany()
+                        .HasForeignKey("VersiculoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Versiculo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -351,6 +464,11 @@ namespace IBNB.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("IBNB.Models.Evento", b =>
+                {
+                    b.Navigation("Imagens");
                 });
 #pragma warning restore 612, 618
         }
