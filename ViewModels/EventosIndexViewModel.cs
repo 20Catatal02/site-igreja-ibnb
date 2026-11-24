@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace IBNB.ViewModels
 {
@@ -33,18 +33,40 @@ namespace IBNB.ViewModels
         // Destaque (Ceia do Senhor / Virada de ano) -> usa a tarja amarela
         public bool Destaque { get; set; }
 
+        // Departamento responsável pela programação (opcional)
+        public string? Departamento { get; set; }
+
+        // Cor do card/tag/linha: segue a mesma legenda do calendário
+        public string Cor
+        {
+            get
+            {
+                if (Destaque) return "#facc15";
+
+                return Departamento?.Trim().ToLowerInvariant() switch
+                {
+                    "homens" => "#1e3a8a",
+                    "mulheres" => "#ec4899",
+                    "jovens" => "#8b5cf6",
+                    _ => "#198754"
+                };
+            }
+        }
+
         // Quantidade de ocorrências cadastradas para este tipo (informativo interno)
         public int OcorrenciasCadastradas { get; set; }
 
         // Rótulo curto do tipo, usado como "tag" na vitrine
-        public string Tag => Subtipo switch
-        {
-            "Ceia" => "Ceia do Senhor",
-            "EBD" => "Escola Bíblica",
-            "CultoNoturno" => "Culto de Celebração",
-            "Virada" => "Virada de Ano",
-            _ => "Evento"
-        };
+        public string Tag => !string.IsNullOrWhiteSpace(Departamento)
+            ? Departamento!
+            : Subtipo switch
+            {
+                "Ceia" => "Ceia do Senhor",
+                "EBD" => "Escola Bíblica",
+                "CultoNoturno" => "Culto de Celebração",
+                "Virada" => "Virada de Ano",
+                _ => "Evento"
+            };
     }
 
     public class EventosIndexViewModel

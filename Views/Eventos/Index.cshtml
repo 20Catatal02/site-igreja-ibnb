@@ -1,4 +1,4 @@
-﻿@model IBNB.ViewModels.EventosIndexViewModel
+@model IBNB.ViewModels.EventosIndexViewModel
 
 @{
     ViewData["Title"] = "Eventos";
@@ -6,6 +6,27 @@
     var corEvento = "#198754";
     var corCeia = "#facc15";
     var culture = new System.Globalization.CultureInfo("pt-BR");
+
+    var coresLinha = Model.Tipos.Select(t => t.Cor).ToList();
+    var paradasLinha = new List<string> { "transparent 0%" };
+
+    if (coresLinha.Count == 1)
+    {
+        paradasLinha.Add($"{coresLinha[0]} 12%");
+        paradasLinha.Add($"{coresLinha[0]} 88%");
+    }
+    else if (coresLinha.Count > 1)
+    {
+        for (int i = 0; i < coresLinha.Count; i++)
+        {
+            var pct = 6 + (i * 88.0 / (coresLinha.Count - 1));
+            paradasLinha.Add($"{coresLinha[i]} {pct:0.#}%");
+        }
+    }
+
+    paradasLinha.Add("transparent 100%");
+    var gradienteLinha = $"linear-gradient(to bottom, {string.Join(", ", paradasLinha)})";
+    var corFim = coresLinha.LastOrDefault() ?? "#198754";
 }
 
 <style>
@@ -51,31 +72,15 @@
         top: 0;
         bottom: 0;
         left: 50%;
-        width: 2px;
+        width: 3px;
         transform: translateX(-50%);
-        background: linear-gradient(to bottom,
-            rgba(25, 135, 84, 0) 0%,
-            rgba(25, 135, 84, .45) 12%,
-            rgba(25, 135, 84, .55) 55%,
-            rgba(250, 204, 21, .55) 100%);
-        opacity: .35;
+        border-radius: 3px;
+        background: var(--ev-linha, linear-gradient(to bottom, transparent 0%, #198754 12%, #198754 88%, transparent 100%));
+        opacity: .45;
         transition: opacity 2.2s cubic-bezier(.16, .84, .44, 1);
     }
     .ev-trilha:hover::before {
         opacity: .75;
-    }
-
-    /* Feriado no periodo: insere o vermelho entre o verde e o amarelo,
-       mantendo a transicao gradual entre as cores. */
-    .ev-trilha.tem-feriado::before {
-        background: linear-gradient(to bottom,
-            rgba(250, 204, 21, 0) 0%,
-            rgba(250, 204, 21, .30) 6%,
-            rgba(250, 204, 21, .55) 22%,
-            rgba(25, 135, 84, .55) 50%,
-            rgba(220, 53, 69, .55) 78%,
-            rgba(220, 53, 69, .30) 94%,
-            rgba(220, 53, 69, 0) 100%);
     }
 
     .ev-bloco {
@@ -121,15 +126,15 @@
         text-transform: uppercase;
         padding: .22rem .6rem;
         border-radius: 999px;
-        background-color: rgba(25, 135, 84, .18);
-        color: #4ade80;
-        border: 1px solid rgba(25, 135, 84, .5);
+        background-color: var(--ev-cor, #198754);
+        color: #fff;
+        border: 1px solid transparent;
         margin-bottom: .7rem;
     }
     .ev-card.destaque .ev-tag {
-        background-color: rgba(250, 204, 21, .16);
-        color: #facc15;
-        border-color: rgba(250, 204, 21, .55);
+        background-color: var(--ev-cor, #facc15);
+        color: #1a1a1a;
+        border-color: transparent;
     }
 
     .ev-titulo {
@@ -185,8 +190,8 @@
         display: none;
     }
     /* Mobile/tablet: a data aparece dentro do card */
-    .ev-data {
-        text-transform: capitalize;
+    .ev-data::first-letter {
+        text-transform: uppercase;
     }
 
     /* ===== Desktop: alterna esquerda / direita ===== */
@@ -207,7 +212,7 @@
             width: 15px;
             height: 15px;
             border-radius: 50%;
-            background-color: #198754;
+            background-color: var(--ev-cor, #198754);
             box-shadow: 0 0 0 5px #1b1f23, 0 0 0 6px #3a3f45;
             transition: background-color .5s cubic-bezier(.22, .61, .36, 1), box-shadow .5s cubic-bezier(.22, .61, .36, 1), transform .5s cubic-bezier(.22, .61, .36, 1);
         }
@@ -269,7 +274,7 @@
             top: 0;
             bottom: 0;
             left: 50%;
-            width: 2px;
+            width: 3px;
             transform: translateX(-50%) scaleY(.3);
             transform-origin: center;
             background-color: var(--ev-cor);
@@ -299,19 +304,12 @@
     }
 
     .ev-bloco:hover .ev-ponto span {
-        background-color: #4ade80;
+        background-color: var(--ev-cor, #4ade80);
         box-shadow:
             0 0 0 5px #1b1f23,
             0 0 0 6px var(--ev-cor),
-            0 0 14px 3px rgba(74, 222, 128, .30);
+            0 0 14px 3px rgba(255, 255, 255, .18);
         transform: scale(1.12);
-    }
-    .ev-bloco.destaque:hover .ev-ponto span {
-        background-color: #fde047;
-        box-shadow:
-            0 0 0 5px #1b1f23,
-            0 0 0 6px #a16207,
-            0 0 14px 3px rgba(250, 204, 21, .30);
     }
 
     /* Card: a luz sobe e desce no mesmo ritmo, sem salto ao trocar de card.
@@ -457,6 +455,29 @@
         }
     }
 
+    .ev-fim {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .9rem;
+        padding: 2.2rem 0 1rem;
+    }
+    .ev-fim-ponto {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background-color: var(--ev-cor);
+        box-shadow: 0 0 0 5px #1b1f23, 0 0 0 6px var(--ev-cor);
+    }
+    .ev-fim .btn {
+        border-color: #3a3f45;
+    }
+    .ev-fim .btn:hover {
+        border-color: var(--ev-cor);
+    }
+
     .ev-vazio {
         text-align: center;
         padding: 4rem 1rem;
@@ -470,8 +491,8 @@
     <section class="ev-hero">
         <h1>Eventos da Igreja</h1>
         <p>
-            Conheça as programações que acontecem em nossa igreja.
-            As próximas programações dos próximos 15 dias, cada uma exibida uma única vez.
+            Conheça as programações dos próximos 15 dias.
+            Cada uma aparece uma única vez.
         </p>
         <div class="ev-acoes">
             <a asp-action="Calendario" class="btn btn-primary px-4">Calendário</a>
@@ -480,35 +501,26 @@
                 <a asp-action="Create" class="btn btn-success px-4">Novo Evento</a>
             }
         </div>
-        @if (!Model.PodeCriarEvento)
-        {
-            <div class="mt-3">
-                <small class="text-white-50">
-                    Para adicionar um novo evento é necessário
-                    <a asp-area="Identity" asp-page="/Account/Login" class="link-light text-decoration-underline">entrar</a>
-                    com uma conta cadastrada.
-                </small>
-            </div>
-        }
     </section>
 
     @if (!Model.Tipos.Any())
     {
         <div class="ev-vazio">
             <h4 class="text-white">Nenhuma programação cadastrada</h4>
-            <p class="mb-0">Assim que os eventos forem adicionados, eles aparecerão aqui.</p>
+            <p class="mb-3">Assim que os eventos forem adicionados, eles aparecerão aqui.</p>
+            <a asp-action="Calendario" class="btn btn-primary px-4">Ver calendário</a>
         </div>
     }
     else
     {
-        <div class="ev-trilha @(Model.TemFeriado ? "tem-feriado" : "")">
+        <div class="ev-trilha" style="--ev-linha: @gradienteLinha;">
             @foreach (var tipo in Model.Tipos)
             {
                 var diasParaProximo = tipo.ProximaData.HasValue
                     ? (tipo.ProximaData.Value.Date - Model.Hoje.Date).Days
                     : (int?)null;
 
-                <div class="ev-bloco @(tipo.Destaque ? "destaque" : "")">
+                <div class="ev-bloco @(tipo.Destaque ? "destaque" : "")" style="--ev-cor: @tipo.Cor;">
 
                     <!-- Card do evento -->
                     <div class="ev-card @(tipo.Destaque ? "destaque" : "")">
@@ -543,7 +555,7 @@
                                 </span>
                             </div>
                             <div class="ev-meta-linha">
-                                <span class="ev-meta-rotulo">Horário</span>
+                                <span class="ev-meta-rotulo">Quando</span>
                                 <span>@tipo.ResumoRecorrencia</span>
                             </div>
                             @if (!string.IsNullOrWhiteSpace(tipo.Local))
@@ -596,6 +608,11 @@
                     </div>
                 </div>
             }
+
+            <div class="ev-fim" style="--ev-cor: @corFim;">
+                <span class="ev-fim-ponto"></span>
+                <a asp-action="Calendario" class="btn btn-outline-light px-4">Ver o calendário completo</a>
+            </div>
         </div>
     }
 </div>

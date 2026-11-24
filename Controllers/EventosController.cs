@@ -64,6 +64,7 @@ namespace IBNB.Controllers
                     Titulo = tipo == "Virada" ? "Culto da Virada + Ceia do Senhor" : oc.Evento.Titulo,
                     Descricao = descricao,
                     Local = oc.Evento.Local,
+                    Departamento = oc.Evento.Departamento,
                     DataHora = oc.Data,
                     ProximaData = oc.Data,
                     Subtipo = tipo,
